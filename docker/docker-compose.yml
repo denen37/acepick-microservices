@@ -1,0 +1,91 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    # restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+    - ENV=${NODE_ENV}
+    - DOMAIN_NAME=${DOMAIN_NAME}
+    - BACKEND_HOST=${BACKEND_HOST}
+    - BACKEND_PORT=${USER_PORT}
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
+      - /etc/ssl/private:/etc/nginx/ssl/private:ro 
+    depends_on:
+      - user
+    networks:
+      - ace-net
+
+  user:
+    build: ../services/user
+    ports:
+      - ${USER_PORT}:${USER_PORT}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    depends_on:
+      user-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ace-net
+
+  user-db:
+    image: mysql:8.0
+    container_name: user-db
+    restart: always
+    environment: 
+      MYSQL_ROOT_PASSWORD: ${USER_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${USER_MYSQL_DATABASE}
+      MYSQL_USER: ${USER_MYSQL_USER}
+      MYSQL_PASSWORD: ${USER_MYSQL_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - user-data:/var/lib/mysql
+    networks:
+      - ace-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] 
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - ace-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      timeout: 3s
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80 
+    environment:
+      PMA_ARBITRARY: 1 
+      PMA_HOSTS: user-db
+      PMA_USER: ${PMA_USER}
+      PMA_PASSWORD: ${PMA_PASSWORD} 
+    networks:
+      - ace-net
+
+volumes:
+  user-data:
+
+networks:
+  ace-net:

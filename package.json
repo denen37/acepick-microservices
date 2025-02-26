@@ -1,0 +1,22 @@
+{
+  "name": "acepick-microservices",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start:user": "cd services/user && npm run start",
+    "start:course": "cd services/course && npm run start",
+    "start:all": "npm run start:user & npm run start:course"
+  },
+  "workspaces": [
+    "services/user"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4"
+  }
+}
