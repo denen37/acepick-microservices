@@ -1,60 +1,28 @@
-version: '3'
+version: '3.8'
 services:
   nginx:
     image: nginx:latest
     container_name: nginx
+    build: .
     # restart: always
     ports:
-      - "80:80"
+      - "8000:80"
       - "443:443"
+    env_file:
+      - ./.env 
     environment:
-    - ENV=${NODE_ENV}
+    - ENV=${ENV}
     - DOMAIN_NAME=${DOMAIN_NAME}
     - BACKEND_HOST=${BACKEND_HOST}
     - BACKEND_PORT=${USER_PORT}
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.${ENV}.conf:/etc/nginx/nginx.conf
       - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
       - /etc/ssl/private:/etc/nginx/ssl/private:ro 
+    networks:
+      - ace-net
     depends_on:
       - user
-    networks:
-      - ace-net
-
-  user:
-    build: ../services/user
-    ports:
-      - ${USER_PORT}:${USER_PORT}
-    environment:
-      - NODE_ENV=${NODE_ENV}
-    depends_on:
-      user-db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - ace-net
-
-  user-db:
-    image: mysql:8.0
-    container_name: user-db
-    restart: always
-    environment: 
-      MYSQL_ROOT_PASSWORD: ${USER_MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${USER_MYSQL_DATABASE}
-      MYSQL_USER: ${USER_MYSQL_USER}
-      MYSQL_PASSWORD: ${USER_MYSQL_PASSWORD}
-    ports:
-      - 3306:3306
-    volumes:
-      - user-data:/var/lib/mysql
-    networks:
-      - ace-net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] 
-      interval: 10s
-      retries: 5
-      timeout: 5s
 
   redis:
     image: redis:latest
@@ -83,9 +51,47 @@ services:
       PMA_PASSWORD: ${PMA_PASSWORD} 
     networks:
       - ace-net
+    
+  user:
+      build: ../services/user
+      env_file:
+        - ../services/user/.env
+      ports:
+        - 5000:5000
+      environment:
+        - NODE_ENV=${NODE_ENV}
+      depends_on:
+        user-db:
+          condition: service_healthy
+        redis:
+          condition: service_healthy
+      networks:
+        - ace-net
+
+  user-db:
+    image: mysql:8.0
+    container_name: user-db
+    restart: always
+    env_file:
+      - ../services/user/.env
+    environment: 
+      MYSQL_ROOT_PASSWORD: Acepick@123
+      MYSQL_DATABASE: index
+    ports:
+      - 3306:3306
+    volumes:
+      - user-data:/var/lib/mysql
+    networks:
+      - ace-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] 
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
 volumes:
   user-data:
 
 networks:
   ace-net:
+    driver: bridge

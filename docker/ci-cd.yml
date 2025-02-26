@@ -1,0 +1,54 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker BuildKit
+        run: |
+          export DOCKER_BUILDKIT=1
+          echo "BuildKit enabled"
+
+      - name: Build Docker Image
+        run: docker build -t your-dockerhub-username/my-app .
+
+      - name: Run Tests
+        run: docker run --rm your-dockerhub-username/my-app npm test
+
+  push-to-docker-hub:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker Image
+        run: |
+          docker tag your-dockerhub-username/my-app your-dockerhub-username/my-app:latest
+          docker push your-dockerhub-username/my-app:latest
+
+  deploy:
+    needs: push-to-docker-hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Remote Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull your-dockerhub-username/my-app:latest
+            docker-compose down
+            docker-compose up -d
