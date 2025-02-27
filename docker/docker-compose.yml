@@ -78,7 +78,7 @@ services:
       MYSQL_ROOT_PASSWORD: Acepick@123
       MYSQL_DATABASE: index
     ports:
-      - 3306:3306
+      - 3307:3306
     volumes:
       - user-data:/var/lib/mysql
     networks:
