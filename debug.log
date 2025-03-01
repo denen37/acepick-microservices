@@ -1,0 +1,4 @@
+[0227/071531.072:ERROR:crashpad_client_win.cc(186)] crash server did not respond, self-terminating
+[0227/071531.677:ERROR:registration_protocol_win.cc(107)] CreateFile: The system cannot find the file specified. (0x2)
+[0227/071549.818:ERROR:registration_protocol_win.cc(107)] CreateFile: The system cannot find the file specified. (0x2)
+[0227/071550.318:ERROR:registration_protocol_win.cc(107)] CreateFile: The system cannot find the file specified. (0x2)

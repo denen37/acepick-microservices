@@ -8,7 +8,8 @@
     "start:all": "npm run start:user & npm run start:course"
   },
   "workspaces": [
-    "services/user"
+    "services/user",
+    "services/jobs"
   ],
   "author": "",
   "license": "ISC",

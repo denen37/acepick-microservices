@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteKey = exports.createRandomRef = exports.getRandom = exports.validateEmail = exports.randomId = exports.errorResponse = exports.successResponseFalse = exports.successResponse = exports.convertHttpToHttps = exports.handleResponse = exports.removeEnd = exports.saltRounds = exports.TOKEN_SECRET = void 0;
+exports.deleteKey = exports.createRandomRef = exports.getRandom = exports.validateEmail = exports.randomId = exports.errorResponse = exports.successResponseFalse = exports.successResponse = exports.convertHttpToHttps = exports.handleResponse = exports.removeEnd = exports.saltRounds = void 0;
 exports.calculateDifferenceBetweenMinMax = calculateDifferenceBetweenMinMax;
 exports.getDistanceFromLatLonInKm = getDistanceFromLatLonInKm;
 exports.isGreaterByOne = isGreaterByOne;
 exports.isEqual = isEqual;
 exports.mergeDuplicates = mergeDuplicates;
 // import { TransactionDateType } from '../models/Transaction';
-exports.TOKEN_SECRET = "222hwhdhnnjduru838272@@$henncndbdhsjj333n33brnfn";
 exports.saltRounds = 10;
 const removeEnd = (str, char) => {
     if (str.length > 1 && str.charAt(str.length - 1) === char) {

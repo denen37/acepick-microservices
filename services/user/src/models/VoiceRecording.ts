@@ -25,7 +25,7 @@ import { Job } from './Job';
 
 
 @Table({ timestamps: true, tableName: 'voicerecord' })
-export class VoiceRecord extends Model {
+export class VoiceRecording extends Model {
 
 
     @AllowNull(true)

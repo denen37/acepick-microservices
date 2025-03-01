@@ -5,7 +5,7 @@ import { LanLog } from './LanLog';
 import { User } from './User';
 import { Dispute } from './Dispute';
 // import { Material } from './Material';
-import { VoiceRecord } from './VoiceRecording';
+import { VoiceRecording } from './VoiceRecording';
 
 
 // export enum UserGender {
@@ -301,8 +301,8 @@ export class Job extends Model {
     dispute!: Dispute[];
 
 
-    // @HasMany(() => VoiceRecord, { onDelete: 'CASCADE' })
-    // record!: VoiceRecord[];
+    // @HasMany(() => VoiceRecording, { onDelete: 'CASCADE' })
+    // record!: VoiceRecording[];
 
 
     // @HasMany(() => Material, { onDelete: 'CASCADE' })

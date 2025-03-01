@@ -143,7 +143,7 @@ __decorate([
 ], Professional.prototype, "userId", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.ForeignKey)(() => Cooperation_1.Corperate),
+    (0, sequelize_typescript_1.ForeignKey)(() => Cooperation_1.Cooperation),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
     __metadata("design:type", Number)
 ], Professional.prototype, "corperateId", void 0);
@@ -162,8 +162,8 @@ __decorate([
     __metadata("design:type", User_1.User)
 ], Professional.prototype, "user", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Cooperation_1.Corperate, { onDelete: 'CASCADE' }),
-    __metadata("design:type", Cooperation_1.Corperate)
+    (0, sequelize_typescript_1.BelongsTo)(() => Cooperation_1.Cooperation, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Cooperation_1.Cooperation)
 ], Professional.prototype, "corperate", void 0);
 exports.Professional = Professional = __decorate([
     (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'professional' })

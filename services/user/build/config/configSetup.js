@@ -49,6 +49,12 @@ const getConfig = () => {
         DB_HOST: process.env.DB_HOST,
         DB_PORT: Number(process.env.DB_PORT),
         DB_DIALECT: process.env.DB_DIALECT,
+        EMAIL_SERVICE: process.env.EMAIL_SERVICE,
+        EMAIL_PORT: Number(process.env.EMAIL_PORT),
+        EMAIL_USER: process.env.EMAIL_USER,
+        EMAIL_PASS: process.env.EMAIL_PASS,
+        EMAIL_HOST: process.env.EMAIL_HOST,
+        TOKEN_SECRET: process.env.TOKEN_SECRET || 'supersecret',
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
         PUBLIC_ROUTES: [

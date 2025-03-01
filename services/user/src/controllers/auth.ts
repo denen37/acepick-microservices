@@ -1,4 +1,5 @@
-import { TOKEN_SECRET, convertHttpToHttps, createRandomRef, deleteKey, errorResponse, handleResponse, randomId, saltRounds, successResponse, successResponseFalse, validateEmail } from "../utils/utility";
+import { convertHttpToHttps, createRandomRef, deleteKey, errorResponse, handleResponse, randomId, saltRounds, successResponse, successResponseFalse, validateEmail } from "../utils/utility";
+import config from "../config/configSetup"
 import { Request, Response } from 'express';
 import { VerificationType, Verify } from "../models/Verify";
 import { sendEmailResend, sendSMS } from "../services/sms";
@@ -11,7 +12,7 @@ import { Wallet, WalletType } from "../models/Wallet";
 import { LanLog } from "../models/LanLog";
 import { Sector } from "../models/Sector";
 import { Profession } from "../models/Profession";
-import { Corperate } from "../models/Cooperation";
+import { Cooperation } from "../models/Cooperation";
 // import { Review } from "../models/Review";
 import { verifyBvn } from "../services/bvn";
 import { compareTwoStrings } from 'string-similarity';
@@ -164,7 +165,7 @@ export const sendOtp = async (req: Request, res: Response) => {
 
 export const verifyOtp = async (req: Request, res: Response) => {
     const { emailServiceId, smsServiceId, smsCode, emailCode, type } = req.body;
-    if (type === "RESET") {
+    if (type === VerificationType.EMAIL) {
 
         const verifyEmail = await Verify.findOne({
             where: {
@@ -195,18 +196,20 @@ export const verifyOtp = async (req: Request, res: Response) => {
                 status: false
             })
         }
-    } else if (type === "ADMIN") {
+    } else if (type === VerificationType.SMS) {
 
-        const verifyEmail = await Verify.findOne({
+        const verifySms = await Verify.findOne({
             where: {
-                serviceId: emailServiceId
+                serviceId: smsServiceId
             }
         })
 
-        if (verifyEmail) {
-            if (verifyEmail.code === emailCode) {
-                const verifyEmailResult = await Verify.findOne({ where: { id: verifyEmail.id } })
-                await verifyEmailResult?.destroy()
+        //smsCode
+
+        if (verifySms) {
+            if (verifySms.code === smsCode) {
+                const verifySmsResult = await Verify.findOne({ where: { id: verifySms.id } })
+                await verifySmsResult?.destroy()
                 return successResponse(res, "Successful", {
                     message: "successful",
                     status: true
@@ -215,55 +218,24 @@ export const verifyOtp = async (req: Request, res: Response) => {
             } else {
 
                 errorResponse(res, "Failed", {
-                    message: `Invalid Email Code`,
+                    message: `Invalid SMS Code`,
                     status: false
                 })
             }
         } else {
             errorResponse(res, "Failed", {
-                message: `Email Code Already Used`,
-                status: false
-            })
-        }
-    } else if (type === "PIN") {
-
-        const verifyEmail = await Verify.findOne({
-            where: {
-                serviceId: emailServiceId
-            }
-        })
-
-        if (verifyEmail) {
-            if (verifyEmail.code === emailCode) {
-
-                const verifyEmailResult = await Verify.findOne({ where: { id: verifyEmail.id } })
-                await verifyEmailResult?.destroy()
-                return successResponse(res, "Successful", {
-                    message: "successful",
-                    status: true
-                })
-
-            } else {
-
-                errorResponse(res, "Failed", {
-                    message: `Invalid ${"Email"} Code`,
-                    status: false
-                })
-            }
-        } else {
-            errorResponse(res, "Failed", {
-                message: `${"Email"} Code Already Used`,
+                message: `SMS Code Already Used`,
                 status: false
             })
         }
     }
 
     else {
-        // const verifySms = await  Verify.findOne({
-        //   where:{
-        //     serviceId:  smsServiceId
-        //   }
-        //  })
+        const verifySms = await Verify.findOne({
+            where: {
+                serviceId: smsServiceId
+            }
+        })
 
         const verifyEmail = await Verify.findOne({
             where: {
@@ -271,41 +243,31 @@ export const verifyOtp = async (req: Request, res: Response) => {
             }
         })
 
-        if (
-            // verifySms && 
-            verifyEmail) {
-            if (
-                // verifySms.code === smsCode &&
-                verifyEmail.code === emailCode) {
+        if (verifySms && verifyEmail) {
+            if (verifySms.code === smsCode && verifyEmail.code === emailCode) {
 
-                //   const verifySmsResult =  await Verify.findOne({ where:{ id: verifySms.id} })
-                //  await  verifySmsResult?.destroy()
+                const verifySmsResult = await Verify.findOne({ where: { id: verifySms.id } })
+                await verifySmsResult?.destroy()
                 const verifyEmailResult = await Verify.findOne({ where: { id: verifyEmail.id } })
                 await verifyEmailResult?.destroy()
                 return successResponse(res, "Successful", {
-                    message: "successful",
+                    message: "email and sms verification successful",
                     status: true
                 })
 
             } else {
                 errorResponse(res, "Failed", {
-                    message: `Invalid ${
-                        // !verifySms?"SmS":
-                        "Email"} Code`,
+                    message: `Invalid ${!verifySms ? "SmS" : "Email"} Code`,
                     status: false
                 })
             }
         } else {
             errorResponse(res, "Failed", {
-                message: `${
-                    // !verifySms?"SmS":
-                    "Email"} Code Already Used`,
+                message: `${!verifySms ? "SmS" : "Email"} Code Already Used`,
                 status: false
             })
         }
     }
-
-
 }
 
 
@@ -342,30 +304,32 @@ export const register = async (req: Request, res: Response) => {
             client: email,
             secret_key: createRandomRef(12, "ace_pick",),
         })
-        const emailResult = await sendEmailResend(user!.email, "Email Verification",
-            `Dear User,<br><br>
+
+        try {
+            const emailResult = await sendEmailResend(user!.email, "Email Verification",
+                `Dear User,<br><br>
       
-        Thank you for choosing our service. To complete your registration and ensure the security of your account, please use the verification code below<br><br>
-        
-        Verification Code: ${codeEmail}<br><br>
-        
-        Please enter this code on our website/app to proceed with your registration process. If you did not initiate this action, please ignore this email.<br><br>
-        
-    `
-        );
-        let token = sign({ id: user.id, email: user.email }, TOKEN_SECRET);
+                Thank you for choosing our service. To complete your registration and ensure the security of your account, please use the verification code below<br><br>
+                
+                Verification Code: ${codeEmail}<br><br>
+                
+                Please enter this code on our website/app to proceed with your registration process. If you did not initiate this action, please ignore this email.<br><br>
+                
+            `
+            );
+        } catch (error) {
+            return errorResponse(res, "An Error Occurred", error)
+        }
+
+        let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
         const chatToken = serverClient.createToken(`${String(user.id)}`);
         const profile = await Profile.findOne({ where: { userId: user.id } })
 
-        const response = await serverClient.upsertUsers([{
-            id: String(user.id),
-            role: 'admin',
-            mycustomfield: {
-                email: `${user.email}`,
-                accountType: profile?.type,
-                userId: String(user.id),
-            }
-        }]);
+        try {
+
+        } catch (error) {
+            return errorResponse(res, "An Error Occurred", error)
+        }
 
         return successResponse(res, "Successful", {
             status: true,
@@ -382,19 +346,22 @@ export const register = async (req: Request, res: Response) => {
 
 
 export const passwordChange = async (req: Request, res: Response) => {
-    let { password, newPassword } = req.body;
+    let { password, confirmPassword } = req.body;
     const { id } = req.user;
+    console.log("id", id);
+    if (password !== confirmPassword) return errorResponse(res, "Password do not match", { status: false, message: "Password do not match" })
+
     const user = await User.findOne({ where: { id } })
     if (!user) return errorResponse(res, "Failed", { status: false, message: "User does not exist" })
-    const match = await compare(password, user.password)
-    if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Password" })
 
-    hash(newPassword, saltRounds, async function (err, hashedPassword) {
+    // const match = await compare(password, user.password)
+    // if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Password" })
+
+    hash(password, saltRounds, async function (err, hashedPassword) {
         await user.update({ password: hashedPassword })
-        let token = sign({ id: user.id, email: user.email }, TOKEN_SECRET);
+        let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
         return successResponse(res, "Successful", { status: true, message: { ...user.dataValues, token } })
     })
-
 }
 
 
@@ -406,7 +373,7 @@ export const login = async (req: Request, res: Response) => {
     if (!user) return errorResponse(res, "Failed", { status: false, message: "User does not exist" })
     const match = await compare(password, user.password)
     if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Credentials" })
-    let token = sign({ id: user.id, email: user.email }, TOKEN_SECRET);
+    let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
     const chatToken = serverClient.createToken(`${String(user.id)}`);
     const profile = await Profile.findOne({ where: { userId: user.id } })
     await profile?.update({ fcmToken })
@@ -440,7 +407,7 @@ export const login = async (req: Request, res: Response) => {
                     ],
                     include: [
 
-                        { model: Corperate },
+                        { model: Cooperation },
                         {
                             model: Profile,
                             where: { userId: profile?.userId },
@@ -529,19 +496,20 @@ export const deleteUsers = async (req: Request, res: Response) => {
 
 
 export const registerStepTwo = async (req: Request, res: Response) => {
-    let { fullName, lga, state, bvn, address, type, avatar } = req.body;
+    let { fullName, lga, state, bvn, address, type } = req.body;
+    let avatar = req.file?.path;
     let { id } = req.user;
+    console.log('id', id)
     console.log(req.body)
     const user = await User.findOne({ where: { id } });
     const profile = await Profile.findOne({ where: { userId: id } });
     if (profile) return errorResponse(res, "Failed", { status: false, message: "Profile Already Exist" })
-    const profileCreate = await Profile.create({ fullName, lga, state, bvn, address, type, userId: id, avatar: convertHttpToHttps(avatar) })
+    const profileCreate = await Profile.create({ fullName, lga, state, bvn, address, type, userId: id, avatar/*: convertHttpToHttps(avatar)*/ })
     const profileX = await Profile.findOne({ where: { userId: id } });
     await sendEmailResend(user!.email, "Welcome to Acepick", `Welcome on board ${profileX!.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
     await user?.update({ state: ProfileType.CLIENT ? UserState.VERIFIED : UserState.STEP_THREE })
     successResponse(res, "Successful", { status: true, message: profileCreate })
 }
-
 
 
 export const registerStepThree = async (req: Request, res: Response) => {
@@ -568,18 +536,14 @@ export const registerStepThree = async (req: Request, res: Response) => {
 
 
 
-
-
-
-
 export const corperateReg = async (req: Request, res: Response) => {
     let { nameOfOrg, phone, address, state, lga, postalCode, regNum, noOfEmployees } = req.body;
     let { id } = req.user;
     const user = await User.findOne({ where: { id } });
-    const corperate = await Corperate.findOne({ where: { userId: id } });
+    const corperate = await Cooperation.findOne({ where: { userId: id } });
     if (corperate) return errorResponse(res, "Failed", { status: false, message: "Coorperate Account Already Exist" })
     const profile = await Profile.findOne({ where: { userId: id } });
-    const coorperateCreate = await Corperate.create({
+    const coorperateCreate = await Cooperation.create({
         nameOfOrg, phone, address, state, lga, postalCode, regNum, noOfEmployees, profileId: profile?.id,
         userId: id
     })
@@ -642,7 +606,7 @@ export const changePassword = async (req: Request, res: Response) => {
     hash(password, saltRounds, async function (err, hashedPassword) {
         const user = await User.findOne({ where: { email: verify.client } });
         user?.update({ password: hashedPassword })
-        let token = sign({ id: user!.id, email: user!.email, admin: true }, TOKEN_SECRET);
+        let token = sign({ id: user!.id, email: user!.email, admin: true }, config.TOKEN_SECRET);
         await verify.destroy()
         return successResponse(res, "Successful", { ...user?.dataValues, token })
     });
@@ -672,7 +636,7 @@ export const ProfAccountInfo = async (req: Request, res: Response) => {
                         }]
                 },
                 {
-                    model: Corperate,
+                    model: Cooperation,
                 },
 
                 {
@@ -972,7 +936,7 @@ export const ProfAccountInfo = async (req: Request, res: Response) => {
 //                 ],
 //                 include: [
 
-//                     { model: Corperate },
+//                     { model: Cooperation },
 //                     {
 //                         model: Profile,
 //                         where: { userId: id },
@@ -1327,7 +1291,7 @@ export const ProfAccountInfo = async (req: Request, res: Response) => {
 //                         }
 //                     ]
 //                 },
-//                 { model: Corperate },
+//                 { model: Cooperation },
 
 //                 {
 //                     model: User,

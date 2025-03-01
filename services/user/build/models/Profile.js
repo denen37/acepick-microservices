@@ -172,7 +172,7 @@ __decorate([
     __metadata("design:type", Professional_1.Professional)
 ], Profile.prototype, "professional", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasMany)(() => VoiceRecording_1.VoiceRecord, { onDelete: 'CASCADE' }),
+    (0, sequelize_typescript_1.HasMany)(() => VoiceRecording_1.VoiceRecording, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)
 ], Profile.prototype, "recording", void 0);
 __decorate([

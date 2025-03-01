@@ -3,7 +3,7 @@ import { User } from './User';
 import { Profession } from './Profession';
 import { Sector } from './Sector';
 import { Profile } from './Profile';
-import { Corperate } from './Cooperation';
+import { Cooperation } from './Cooperation';
 // import { Review } from './Review';
 import { ProfessionalSector } from './ProfessionalSector';
 
@@ -152,7 +152,7 @@ export class Professional extends Model {
 
 
     @AllowNull(true)
-    @ForeignKey(() => Corperate)
+    @ForeignKey(() => Cooperation)
     @Column(DataType.INTEGER)
     corperateId!: number;
 
@@ -172,8 +172,8 @@ export class Professional extends Model {
     user!: User;
 
 
-    @BelongsTo(() => Corperate, { onDelete: 'CASCADE' })
-    corperate!: Corperate;
+    @BelongsTo(() => Cooperation, { onDelete: 'CASCADE' })
+    corperate!: Cooperation;
 
 
 

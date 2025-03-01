@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Import packages
 const express_1 = require("express");
 const auth_1 = require("../controllers/auth");
+const upload_1 = require("../utils/upload");
 const routes = (0, express_1.Router)();
 /*************************************************************************
 API CALL START
@@ -17,7 +18,7 @@ routes.post('/update-professional', auth_1.updateProfessional);
 routes.get('/professional/profile', auth_1.ProfAccountInfo);
 routes.post('/corperate', auth_1.ProfAccountInfo);
 routes.post('/register', auth_1.register);
-routes.post('/register-steptwo', auth_1.registerStepTwo);
+routes.post('/register-steptwo', upload_1.uploads.single('avatar'), auth_1.registerStepTwo);
 routes.post('/prof-register-stepthree', auth_1.registerStepThree);
 routes.post('/corperate-register', auth_1.corperateReg);
 routes.post('/login', auth_1.login);

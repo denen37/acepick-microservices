@@ -20,7 +20,8 @@ const sendSMS = (phone, code) => __awaiter(void 0, void 0, void 0, function* () 
         "sms": `${code} is your Ace-Pick access code. Do not share this with anyone.`,
         "type": "plain",
         "channel": "dnd",
-        "api_key": "TL2ofq7ayT0gl1h8r1xEXXCGW6C9VYORpdJjRuJ2xBsFxTGO1mEM6qP8FORHPO",
+        // "api_key": "TL2ofq7ayT0gl1h8r1xEXXCGW6C9VYORpdJjRuJ2xBsFxTGO1mEM6qP8FORHPO",
+        "api_key": "TLzqURHkmkKBqbeuZwMJeKsCCqcHrhcLaOXUrLBBxmzBtJturGSHEyJOYIzxuK"
     }, {
         headers: {
             'Content-Type': ['application/json', 'application/json']

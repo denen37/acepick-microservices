@@ -25,9 +25,17 @@ cloudinary.config({
     api_key: '774921177923962',
     api_secret: 'dDUKTJBycDHC4gjOKZ9UAHw8SAM'
 });
+const pathExistsOrCreate = (dirPath) => {
+    let filepath = path.resolve(__dirname, dirPath);
+    if (!fs.existsSync(filepath)) {
+        fs.mkdirSync(filepath, { recursive: true });
+        console.log(`Directory created: ${filepath}`);
+    }
+    return filepath;
+};
 const imageStorage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './image');
+        cb(null, pathExistsOrCreate('../public/images'));
     },
     filename: (req, file, cb) => {
         let filename = Date.now() + "--" + file.originalname;

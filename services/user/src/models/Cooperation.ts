@@ -8,7 +8,7 @@ import { Profile } from './Profile';
 
 
 @Table({ timestamps: true, tableName: 'corperate' })
-export class Corperate extends Model {
+export class Cooperation extends Model {
 
     @AllowNull(true)
     @Column(DataType.STRING)

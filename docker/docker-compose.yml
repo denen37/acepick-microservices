@@ -1,28 +1,29 @@
 version: '3.8'
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    build: .
-    # restart: always
-    ports:
-      - "8000:80"
-      - "443:443"
-    env_file:
-      - ./.env 
-    environment:
-    - ENV=${ENV}
-    - DOMAIN_NAME=${DOMAIN_NAME}
-    - BACKEND_HOST=${BACKEND_HOST}
-    - BACKEND_PORT=${USER_PORT}
-    volumes:
-      - ./nginx/nginx.${ENV}.conf:/etc/nginx/nginx.conf
-      - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
-      - /etc/ssl/private:/etc/nginx/ssl/private:ro 
-    networks:
-      - ace-net
-    depends_on:
-      - user
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: nginx
+  #   build: .
+  #   # restart: always
+  #   ports:
+  #     - "8000:80"
+  #     - "443:443"
+  #   env_file:
+  #     - ./.env 
+  #   environment:
+  #   - ENV=${ENV}
+  #   - DOMAIN_NAME=${DOMAIN_NAME}
+  #   - BACKEND_HOST=${BACKEND_HOST}
+  #   - BACKEND_PORT=${USER_PORT}
+  #   volumes:
+  #     - ./nginx/nginx.${ENV}.conf:/etc/nginx/nginx.conf
+  #     - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
+  #     - /etc/ssl/private:/etc/nginx/ssl/private:ro 
+  #   networks:
+  #     - ace-net
+  #   depends_on:
+  #     - user
+  #     - jobs
 
   redis:
     image: redis:latest
@@ -46,9 +47,9 @@ services:
       - 8080:80 
     environment:
       PMA_ARBITRARY: 1 
-      PMA_HOSTS: user-db
-      PMA_USER: ${PMA_USER}
-      PMA_PASSWORD: ${PMA_PASSWORD} 
+      PMA_HOSTS: user-db,jobs-db
+      PMA_USER: root
+      PMA_PASSWORD: Acepick@123
     networks:
       - ace-net
     
@@ -74,9 +75,6 @@ services:
     restart: always
     env_file:
       - ../services/user/.env
-    environment: 
-      MYSQL_ROOT_PASSWORD: Acepick@123
-      MYSQL_DATABASE: index
     ports:
       - 3307:3306
     volumes:
@@ -89,8 +87,46 @@ services:
       retries: 5
       timeout: 5s
 
+  jobs:
+      build: ../services/jobs
+      env_file:
+        - ../services/jobs/.env
+      ports:
+        - 5001:5001
+      environment:
+        - NODE_ENV=${NODE_ENV}
+      depends_on:
+        jobs-db:
+          condition: service_healthy
+        redis:
+          condition: service_healthy
+      networks:
+        - ace-net
+
+  jobs-db:
+    image: mysql:8.0
+    container_name: jobs-db
+    restart: always
+    env_file:
+      - ../services/jobs/.env
+    environment: 
+      MYSQL_ROOT_PASSWORD: Acepick@123
+      MYSQL_DATABASE: jobs
+    ports:
+      - 3308:3306
+    volumes:
+      - jobs-data:/var/lib/mysql
+    networks:
+      - ace-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] 
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
 volumes:
   user-data:
+  jobs-data:
 
 networks:
   ace-net:

@@ -1,12 +1,13 @@
 import express, { Request, Response } from 'express';
 import * as dotenv from 'dotenv';
 import path from "path";
-import db from './models/index';
+import db from './config/db';
 import config from './config/configSetup';
 import cors from 'cors';
 import { isAuthorized } from './middlewares/authorize';
 import index from './routes/index';
 import auth from './routes/auth';
+import "reflect-metadata";
 
 const app = express();
 
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(cors({ origin: true }));
 
 app.get('/', (req: Request, res: Response) => {
-    res.status(200).json({ message: 'Hello, world!' });
+    res.status(200).json({ message: 'Hello, world! This is the user service' });
 });
 
 app.all('*', isAuthorized);
@@ -26,3 +27,6 @@ db.sync({ alter: true }).then(() => {
     app.listen(config.PORT, () => console.log(`Server is running on http://localhost:${config.PORT}`));
 })
     .catch(err => console.error('Error connecting to the database', err));
+
+
+export default app;

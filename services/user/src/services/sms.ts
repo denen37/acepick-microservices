@@ -14,7 +14,8 @@ export const sendSMS = async (phone: number, code: string) => {
             "sms": `${code} is your Ace-Pick access code. Do not share this with anyone.`,
             "type": "plain",
             "channel": "dnd",
-            "api_key": "TL2ofq7ayT0gl1h8r1xEXXCGW6C9VYORpdJjRuJ2xBsFxTGO1mEM6qP8FORHPO",
+            // "api_key": "TL2ofq7ayT0gl1h8r1xEXXCGW6C9VYORpdJjRuJ2xBsFxTGO1mEM6qP8FORHPO",
+            "api_key": "TLzqURHkmkKBqbeuZwMJeKsCCqcHrhcLaOXUrLBBxmzBtJturGSHEyJOYIzxuK"
         },
         {
             headers: {

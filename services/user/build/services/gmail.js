@@ -8,20 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendEmail = sendEmail;
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+const configSetup_1 = __importDefault(require("../config/configSetup"));
 const transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
-    port: process.env.EMAIL_PORT,
+    service: configSetup_1.default.EMAIL_SERVICE,
+    port: configSetup_1.default.EMAIL_PORT,
     secure: true,
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: configSetup_1.default.EMAIL_USER,
+        pass: configSetup_1.default.EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false // Disable certificate validation
+        rejectUnauthorized: false
     }
 });
 function sendEmail(to, subject, text, html) {

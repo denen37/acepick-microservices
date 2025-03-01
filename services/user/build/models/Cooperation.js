@@ -9,69 +9,69 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Corperate = void 0;
+exports.Cooperation = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = require("./User");
 const Profile_1 = require("./Profile");
-let Corperate = class Corperate extends sequelize_typescript_1.Model {
+let Cooperation = class Cooperation extends sequelize_typescript_1.Model {
 };
-exports.Corperate = Corperate;
+exports.Cooperation = Cooperation;
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", String)
-], Corperate.prototype, "nameOfOrg", void 0);
+], Cooperation.prototype, "nameOfOrg", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", String)
-], Corperate.prototype, "phone", void 0);
+], Cooperation.prototype, "phone", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", String)
-], Corperate.prototype, "address", void 0);
+], Cooperation.prototype, "address", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", String)
-], Corperate.prototype, "state", void 0);
+], Cooperation.prototype, "state", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", String)
-], Corperate.prototype, "lga", void 0);
+], Cooperation.prototype, "lga", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", String)
-], Corperate.prototype, "regNum", void 0);
+], Cooperation.prototype, "regNum", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", Number)
-], Corperate.prototype, "noOfEmployees", void 0);
+], Cooperation.prototype, "noOfEmployees", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.UUID),
     __metadata("design:type", String)
-], Corperate.prototype, "userId", void 0);
+], Cooperation.prototype, "userId", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.ForeignKey)(() => Profile_1.Profile),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
     __metadata("design:type", Number)
-], Corperate.prototype, "profileId", void 0);
+], Cooperation.prototype, "profileId", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Profile_1.Profile, { onDelete: 'CASCADE' }),
     __metadata("design:type", Profile_1.Profile)
-], Corperate.prototype, "profile", void 0);
+], Cooperation.prototype, "profile", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { onDelete: 'CASCADE' }),
     __metadata("design:type", User_1.User)
-], Corperate.prototype, "user", void 0);
-exports.Corperate = Corperate = __decorate([
+], Cooperation.prototype, "user", void 0);
+exports.Cooperation = Cooperation = __decorate([
     (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'corperate' })
-], Corperate);
+], Cooperation);
 //# sourceMappingURL=Cooperation.js.map

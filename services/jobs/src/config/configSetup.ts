@@ -11,15 +11,9 @@ type Config = {
     DB_HOST: string | undefined;
     DB_PORT: number | undefined;
     DB_DIALECT: string | undefined;
-    EMAIL_SERVICE: string | undefined;
-    EMAIL_PORT: number | undefined;
-    EMAIL_USER: string | undefined;
-    EMAIL_PASS: string | undefined;
-    EMAIL_HOST: string | undefined;
     PUBLIC_ROUTES: string[] | [];
     REDIS_INSTANCE_URL: string | undefined;
     PAYSTACK_SECRET: string | undefined;
-    TOKEN_SECRET: string;
 };
 
 const getConfig = (): Config => {
@@ -32,12 +26,6 @@ const getConfig = (): Config => {
         DB_HOST: process.env.DB_HOST,
         DB_PORT: Number(process.env.DB_PORT),
         DB_DIALECT: process.env.DB_DIALECT,
-        EMAIL_SERVICE: process.env.EMAIL_SERVICE,
-        EMAIL_PORT: Number(process.env.EMAIL_PORT),
-        EMAIL_USER: process.env.EMAIL_USER,
-        EMAIL_PASS: process.env.EMAIL_PASS,
-        EMAIL_HOST: process.env.EMAIL_HOST,
-        TOKEN_SECRET: process.env.TOKEN_SECRET || 'supersecret',
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
         PUBLIC_ROUTES: [

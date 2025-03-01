@@ -3,7 +3,6 @@ import config from '../config/configSetup';
 import moment from 'moment';
 // import { TransactionDateType } from '../models/Transaction';
 
-export const TOKEN_SECRET = "222hwhdhnnjduru838272@@$henncndbdhsjj333n33brnfn";
 export const saltRounds = 10;
 
 export const removeEnd = (str: string, char: string) => {

@@ -2,7 +2,7 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 import { User } from './User';
 import { Professional } from './Professional';
 import { LanLog } from './LanLog';
-import { VoiceRecord } from './VoiceRecording';
+import { VoiceRecording } from './VoiceRecording';
 // import { Review } from './Review';
 import { ProfessionalSector } from './ProfessionalSector';
 // import { MarketPlace } from './Market';
@@ -200,8 +200,8 @@ export class Profile extends Model {
 
 
 
-    @HasMany(() => VoiceRecord, { onDelete: 'CASCADE' })
-    recording!: VoiceRecord[];
+    @HasMany(() => VoiceRecording, { onDelete: 'CASCADE' })
+    recording!: VoiceRecording[];
 
 
     @HasMany(() => ProfessionalSector, { onDelete: 'CASCADE' })

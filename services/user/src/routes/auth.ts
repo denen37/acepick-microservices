@@ -1,11 +1,7 @@
-
-
-
-
-
 // Import packages
 import { Router } from 'express';
 import { ProfAccountInfo, /*accountInfo, accountSingleInfo,*/ changePassword, corperateReg, deleteUsers, login, passwordChange, register, registerStepThree, registerStepTwo, sendOtp, swithAccount, updateFcmToken, updateProfessional, updateProfile, verifyBvnDetail, verifyOtp } from '../controllers/auth';
+import { uploads } from '../utils/upload';
 
 
 const routes = Router();
@@ -24,7 +20,7 @@ routes.post('/update-professional', updateProfessional);
 routes.get('/professional/profile', ProfAccountInfo);
 routes.post('/corperate', ProfAccountInfo);
 routes.post('/register', register);
-routes.post('/register-steptwo', registerStepTwo);
+routes.post('/register-steptwo', uploads.single('avatar'), registerStepTwo);
 routes.post('/prof-register-stepthree', registerStepThree);
 routes.post('/corperate-register', corperateReg);
 routes.post('/login', login);

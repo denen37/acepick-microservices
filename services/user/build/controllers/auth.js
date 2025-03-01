@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyBvnDetail = exports.postlocationData = exports.ProfAccountInfo = exports.changePassword = exports.updateFcmToken = exports.swithAccount = exports.corperateReg = exports.registerStepThree = exports.registerStepTwo = exports.deleteUsers = exports.login = exports.passwordChange = exports.register = exports.verifyOtp = exports.sendOtp = exports.updateProfessional = exports.updateProfile = void 0;
 const utility_1 = require("../utils/utility");
+const configSetup_1 = __importDefault(require("../config/configSetup"));
 const Verify_1 = require("../models/Verify");
 const sms_1 = require("../services/sms");
 const User_1 = require("../models/User");
@@ -145,7 +149,7 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.sendOtp = sendOtp;
 const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { emailServiceId, smsServiceId, smsCode, emailCode, type } = req.body;
-    if (type === "RESET") {
+    if (type === Verify_1.VerificationType.EMAIL) {
         const verifyEmail = yield Verify_1.Verify.findOne({
             where: {
                 serviceId: emailServiceId
@@ -174,16 +178,17 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
     }
-    else if (type === "ADMIN") {
-        const verifyEmail = yield Verify_1.Verify.findOne({
+    else if (type === Verify_1.VerificationType.SMS) {
+        const verifySms = yield Verify_1.Verify.findOne({
             where: {
-                serviceId: emailServiceId
+                serviceId: smsServiceId
             }
         });
-        if (verifyEmail) {
-            if (verifyEmail.code === emailCode) {
-                const verifyEmailResult = yield Verify_1.Verify.findOne({ where: { id: verifyEmail.id } });
-                yield (verifyEmailResult === null || verifyEmailResult === void 0 ? void 0 : verifyEmailResult.destroy());
+        //smsCode
+        if (verifySms) {
+            if (verifySms.code === smsCode) {
+                const verifySmsResult = yield Verify_1.Verify.findOne({ where: { id: verifySms.id } });
+                yield (verifySmsResult === null || verifySmsResult === void 0 ? void 0 : verifySmsResult.destroy());
                 return (0, utility_1.successResponse)(res, "Successful", {
                     message: "successful",
                     status: true
@@ -191,87 +196,50 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
             else {
                 (0, utility_1.errorResponse)(res, "Failed", {
-                    message: `Invalid Email Code`,
+                    message: `Invalid SMS Code`,
                     status: false
                 });
             }
         }
         else {
             (0, utility_1.errorResponse)(res, "Failed", {
-                message: `Email Code Already Used`,
-                status: false
-            });
-        }
-    }
-    else if (type === "PIN") {
-        const verifyEmail = yield Verify_1.Verify.findOne({
-            where: {
-                serviceId: emailServiceId
-            }
-        });
-        if (verifyEmail) {
-            if (verifyEmail.code === emailCode) {
-                const verifyEmailResult = yield Verify_1.Verify.findOne({ where: { id: verifyEmail.id } });
-                yield (verifyEmailResult === null || verifyEmailResult === void 0 ? void 0 : verifyEmailResult.destroy());
-                return (0, utility_1.successResponse)(res, "Successful", {
-                    message: "successful",
-                    status: true
-                });
-            }
-            else {
-                (0, utility_1.errorResponse)(res, "Failed", {
-                    message: `Invalid ${"Email"} Code`,
-                    status: false
-                });
-            }
-        }
-        else {
-            (0, utility_1.errorResponse)(res, "Failed", {
-                message: `${"Email"} Code Already Used`,
+                message: `SMS Code Already Used`,
                 status: false
             });
         }
     }
     else {
-        // const verifySms = await  Verify.findOne({
-        //   where:{
-        //     serviceId:  smsServiceId
-        //   }
-        //  })
+        const verifySms = yield Verify_1.Verify.findOne({
+            where: {
+                serviceId: smsServiceId
+            }
+        });
         const verifyEmail = yield Verify_1.Verify.findOne({
             where: {
                 serviceId: emailServiceId
             }
         });
-        if (
-        // verifySms && 
-        verifyEmail) {
-            if (
-            // verifySms.code === smsCode &&
-            verifyEmail.code === emailCode) {
-                //   const verifySmsResult =  await Verify.findOne({ where:{ id: verifySms.id} })
-                //  await  verifySmsResult?.destroy()
+        if (verifySms && verifyEmail) {
+            if (verifySms.code === smsCode && verifyEmail.code === emailCode) {
+                const verifySmsResult = yield Verify_1.Verify.findOne({ where: { id: verifySms.id } });
+                yield (verifySmsResult === null || verifySmsResult === void 0 ? void 0 : verifySmsResult.destroy());
                 const verifyEmailResult = yield Verify_1.Verify.findOne({ where: { id: verifyEmail.id } });
                 yield (verifyEmailResult === null || verifyEmailResult === void 0 ? void 0 : verifyEmailResult.destroy());
                 return (0, utility_1.successResponse)(res, "Successful", {
-                    message: "successful",
+                    message: "email and sms verification successful",
                     status: true
                 });
             }
             else {
                 (0, utility_1.errorResponse)(res, "Failed", {
-                    message: `Invalid ${
-                    // !verifySms?"SmS":
-                    "Email"} Code`,
+                    message: `Invalid ${!verifySms ? "SmS" : "Email"} Code`,
                     status: false
                 });
             }
         }
         else {
             (0, utility_1.errorResponse)(res, "Failed", {
-                message: `${
-                // !verifySms?"SmS":
-                "Email"} Code Already Used`,
+                message: `${!verifySms ? "SmS" : "Email"} Code Already Used`,
                 status: false
             });
         }
@@ -309,27 +277,28 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 client: email,
                 secret_key: (0, utility_1.createRandomRef)(12, "ace_pick"),
             });
-            const emailResult = yield (0, sms_1.sendEmailResend)(user.email, "Email Verification", `Dear User,<br><br>
+            try {
+                const emailResult = yield (0, sms_1.sendEmailResend)(user.email, "Email Verification", `Dear User,<br><br>
       
-        Thank you for choosing our service. To complete your registration and ensure the security of your account, please use the verification code below<br><br>
-        
-        Verification Code: ${codeEmail}<br><br>
-        
-        Please enter this code on our website/app to proceed with your registration process. If you did not initiate this action, please ignore this email.<br><br>
-        
-    `);
-            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, utility_1.TOKEN_SECRET);
+                Thank you for choosing our service. To complete your registration and ensure the security of your account, please use the verification code below<br><br>
+                
+                Verification Code: ${codeEmail}<br><br>
+                
+                Please enter this code on our website/app to proceed with your registration process. If you did not initiate this action, please ignore this email.<br><br>
+                
+            `);
+            }
+            catch (error) {
+                return (0, utility_1.errorResponse)(res, "An Error Occurred", error);
+            }
+            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, configSetup_1.default.TOKEN_SECRET);
             const chatToken = serverClient.createToken(`${String(user.id)}`);
             const profile = yield Profile_1.Profile.findOne({ where: { userId: user.id } });
-            const response = yield serverClient.upsertUsers([{
-                    id: String(user.id),
-                    role: 'admin',
-                    mycustomfield: {
-                        email: `${user.email}`,
-                        accountType: profile === null || profile === void 0 ? void 0 : profile.type,
-                        userId: String(user.id),
-                    }
-                }]);
+            try {
+            }
+            catch (error) {
+                return (0, utility_1.errorResponse)(res, "An Error Occurred", error);
+            }
             return (0, utility_1.successResponse)(res, "Successful", {
                 status: true,
                 message: {
@@ -341,18 +310,20 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.register = register;
 const passwordChange = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { password, newPassword } = req.body;
+    let { password, confirmPassword } = req.body;
     const { id } = req.user;
+    console.log("id", id);
+    if (password !== confirmPassword)
+        return (0, utility_1.errorResponse)(res, "Password do not match", { status: false, message: "Password do not match" });
     const user = yield User_1.User.findOne({ where: { id } });
     if (!user)
         return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "User does not exist" });
-    const match = yield (0, bcryptjs_1.compare)(password, user.password);
-    if (!match)
-        return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Invalid Password" });
-    (0, bcryptjs_1.hash)(newPassword, utility_1.saltRounds, function (err, hashedPassword) {
+    // const match = await compare(password, user.password)
+    // if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Password" })
+    (0, bcryptjs_1.hash)(password, utility_1.saltRounds, function (err, hashedPassword) {
         return __awaiter(this, void 0, void 0, function* () {
             yield user.update({ password: hashedPassword });
-            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, utility_1.TOKEN_SECRET);
+            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, configSetup_1.default.TOKEN_SECRET);
             return (0, utility_1.successResponse)(res, "Successful", { status: true, message: Object.assign(Object.assign({}, user.dataValues), { token }) });
         });
     });
@@ -366,7 +337,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const match = yield (0, bcryptjs_1.compare)(password, user.password);
     if (!match)
         return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Invalid Credentials" });
-    let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, utility_1.TOKEN_SECRET);
+    let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, configSetup_1.default.TOKEN_SECRET);
     const chatToken = serverClient.createToken(`${String(user.id)}`);
     const profile = yield Profile_1.Profile.findOne({ where: { userId: user.id } });
     yield (profile === null || profile === void 0 ? void 0 : profile.update({ fcmToken }));
@@ -396,7 +367,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     ['id', 'DESC']
                 ],
                 include: [
-                    { model: Cooperation_1.Corperate },
+                    { model: Cooperation_1.Cooperation },
                     {
                         model: Profile_1.Profile,
                         where: { userId: profile === null || profile === void 0 ? void 0 : profile.userId },
@@ -469,14 +440,17 @@ const deleteUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.deleteUsers = deleteUsers;
 const registerStepTwo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { fullName, lga, state, bvn, address, type, avatar } = req.body;
+    var _a;
+    let { fullName, lga, state, bvn, address, type } = req.body;
+    let avatar = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
     let { id } = req.user;
+    console.log('id', id);
     console.log(req.body);
     const user = yield User_1.User.findOne({ where: { id } });
     const profile = yield Profile_1.Profile.findOne({ where: { userId: id } });
     if (profile)
         return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Profile Already Exist" });
-    const profileCreate = yield Profile_1.Profile.create({ fullName, lga, state, bvn, address, type, userId: id, avatar: (0, utility_1.convertHttpToHttps)(avatar) });
+    const profileCreate = yield Profile_1.Profile.create({ fullName, lga, state, bvn, address, type, userId: id, avatar /*: convertHttpToHttps(avatar)*/ });
     const profileX = yield Profile_1.Profile.findOne({ where: { userId: id } });
     yield (0, sms_1.sendEmailResend)(user.email, "Welcome to Acepick", `Welcome on board ${profileX.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
     yield (user === null || user === void 0 ? void 0 : user.update({ state: Profile_1.ProfileType.CLIENT ? User_1.UserState.VERIFIED : User_1.UserState.STEP_THREE }));
@@ -509,11 +483,11 @@ const corperateReg = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     let { nameOfOrg, phone, address, state, lga, postalCode, regNum, noOfEmployees } = req.body;
     let { id } = req.user;
     const user = yield User_1.User.findOne({ where: { id } });
-    const corperate = yield Cooperation_1.Corperate.findOne({ where: { userId: id } });
+    const corperate = yield Cooperation_1.Cooperation.findOne({ where: { userId: id } });
     if (corperate)
         return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Coorperate Account Already Exist" });
     const profile = yield Profile_1.Profile.findOne({ where: { userId: id } });
-    const coorperateCreate = yield Cooperation_1.Corperate.create({
+    const coorperateCreate = yield Cooperation_1.Cooperation.create({
         nameOfOrg, phone, address, state, lga, postalCode, regNum, noOfEmployees, profileId: profile === null || profile === void 0 ? void 0 : profile.id,
         userId: id
     });
@@ -566,7 +540,7 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne({ where: { email: verify.client } });
             user === null || user === void 0 ? void 0 : user.update({ password: hashedPassword });
-            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, admin: true }, utility_1.TOKEN_SECRET);
+            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, admin: true }, configSetup_1.default.TOKEN_SECRET);
             yield verify.destroy();
             return (0, utility_1.successResponse)(res, "Successful", Object.assign(Object.assign({}, user === null || user === void 0 ? void 0 : user.dataValues), { token }));
         });
@@ -593,7 +567,7 @@ const ProfAccountInfo = (req, res) => __awaiter(void 0, void 0, void 0, function
                     }]
             },
             {
-                model: Cooperation_1.Corperate,
+                model: Cooperation_1.Cooperation,
             },
             {
                 model: Profile_1.Profile,
@@ -824,7 +798,7 @@ exports.ProfAccountInfo = ProfAccountInfo;
 //                     ['id', 'DESC']
 //                 ],
 //                 include: [
-//                     { model: Corperate },
+//                     { model: Cooperation },
 //                     {
 //                         model: Profile,
 //                         where: { userId: id },
@@ -1095,7 +1069,7 @@ exports.ProfAccountInfo = ProfAccountInfo;
 //                         }
 //                     ]
 //                 },
-//                 { model: Corperate },
+//                 { model: Cooperation },
 //                 {
 //                     model: User,
 //                     include: [{ model: LanLog },
