@@ -76,7 +76,7 @@ services:
     env_file:
       - ../services/user/.env
     ports:
-      - 3307:3306
+      - 3306:3306
     volumes:
       - user-data:/var/lib/mysql
     networks:
