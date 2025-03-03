@@ -90,45 +90,45 @@ services:
       retries: 5
       timeout: 5s
 
-  jobs:
-      build: ../services/jobs
-      dns:
-        - 8.8.8.8
-        - 1.1.1.1
-      env_file:
-        - ../services/jobs/.env
-      ports:
-        - 5001:5001
-      environment:
-        - NODE_ENV=${NODE_ENV}
-      depends_on:
-        jobs-db:
-          condition: service_healthy
-        redis:
-          condition: service_healthy
-      networks:
-        - ace-net
+  # jobs:
+  #     build: ../services/jobs
+  #     dns:
+  #       - 8.8.8.8
+  #       - 1.1.1.1
+  #     env_file:
+  #       - ../services/jobs/.env
+  #     ports:
+  #       - 5001:5001
+  #     environment:
+  #       - NODE_ENV=${NODE_ENV}
+  #     depends_on:
+  #       jobs-db:
+  #         condition: service_healthy
+  #       redis:
+  #         condition: service_healthy
+  #     networks:
+  #       - ace-net
 
-  jobs-db:
-    image: mysql:8.0
-    container_name: jobs-db
-    restart: always
-    env_file:
-      - ../services/jobs/.env
-    environment: 
-      MYSQL_ROOT_PASSWORD: Acepick@123
-      MYSQL_DATABASE: jobs
-    ports:
-      - 3308:3306
-    volumes:
-      - jobs-data:/var/lib/mysql
-    networks:
-      - ace-net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] 
-      interval: 10s
-      retries: 5
-      timeout: 5s
+  # jobs-db:
+  #   image: mysql:8.0
+  #   container_name: jobs-db
+  #   restart: always
+  #   env_file:
+  #     - ../services/jobs/.env
+  #   environment: 
+  #     MYSQL_ROOT_PASSWORD: Acepick@123
+  #     MYSQL_DATABASE: jobs
+  #   ports:
+  #     - 3308:3306
+  #   volumes:
+  #     - jobs-data:/var/lib/mysql
+  #   networks:
+  #     - ace-net
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] 
+  #     interval: 10s
+  #     retries: 5
+  #     timeout: 5s
 
 volumes:
   user-data:
