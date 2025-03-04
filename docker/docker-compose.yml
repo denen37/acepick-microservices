@@ -23,7 +23,7 @@ services:
       - ace-net
     depends_on:
       - user
-      - jobs
+      # - jobs
 
   redis:
     image: redis:latest
