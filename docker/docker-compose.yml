@@ -1,29 +1,29 @@
 version: '3.8'
 services:
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx
-  #   build: .
-  #   # restart: always
-  #   ports:
-  #     - "8000:80"
-  #     - "443:443"
-  #   env_file:
-  #     - ./.env 
-  #   environment:
-  #   - ENV=${ENV}
-  #   - DOMAIN_NAME=${DOMAIN_NAME}
-  #   - BACKEND_HOST=${BACKEND_HOST}
-  #   - BACKEND_PORT=${USER_PORT}
-  #   volumes:
-  #     - ./nginx/nginx.${ENV}.conf:/etc/nginx/nginx.conf
-  #     - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
-  #     - /etc/ssl/private:/etc/nginx/ssl/private:ro 
-  #   networks:
-  #     - ace-net
-  #   depends_on:
-  #     - user
-  #     - jobs
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    build: .
+    # restart: always
+    ports:
+      - "8000:80"
+      - "443:443"
+    env_file:
+      - ./.env 
+    environment:
+    - ENV=${ENV}
+    - DOMAIN_NAME=${DOMAIN_NAME}
+    - BACKEND_HOST=${BACKEND_HOST}
+    - BACKEND_PORT=${USER_PORT}
+    volumes:
+      - ./nginx/nginx.${ENV}.conf:/etc/nginx/nginx.conf
+      - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
+      - /etc/ssl/private:/etc/nginx/ssl/private:ro 
+    networks:
+      - ace-net
+    depends_on:
+      - user
+      - jobs
 
   redis:
     image: redis:latest
@@ -79,7 +79,7 @@ services:
     env_file:
       - ../services/user/.env
     ports:
-      - 3306:3306
+      - 3309:3306
     volumes:
       - user-data:/var/lib/mysql
     networks:
