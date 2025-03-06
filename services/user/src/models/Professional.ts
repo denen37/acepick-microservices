@@ -1,11 +1,9 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey } from 'sequelize-typescript';
-import { User } from './User';
-import { Profession } from './Profession';
-import { Sector } from './Sector';
-import { Profile } from './Profile';
-import { Cooperation } from './Cooperation';
+// import { User } from './User';
+// import { Profession } from './Profession';
+// import { Profile } from './Profile';
+// import { Cooperation } from './Cooperation';
 // import { Review } from './Review';
-import { ProfessionalSector } from './ProfessionalSector';
 
 
 // export enum UserGender {
@@ -13,6 +11,7 @@ import { ProfessionalSector } from './ProfessionalSector';
 // 	FEMALE = 'FEMALE',
 // 	OTHER = 'OTHER',
 // }
+
 export enum WorkType {
     BUSY = 'BUSY',
     IDLE = 'IDLE',
@@ -36,10 +35,10 @@ export class Professional extends Model {
     chargeFrom!: any;
 
 
-    @Default({ "language": ["English"] })
+    @Default("English")
     @AllowNull(true)
-    @Column(DataType.JSON)
-    language!: any;
+    @Column(DataType.STRING(100))
+    language!: string;
 
 
 
@@ -142,43 +141,39 @@ export class Professional extends Model {
 
 
 
-    @ForeignKey(() => User)
+    // @ForeignKey(() => User)
     @AllowNull(false)
     @Column(DataType.UUID)
     userId!: string;
 
-
-
-
-
-    @AllowNull(true)
-    @ForeignKey(() => Cooperation)
+    @AllowNull(false)
+    // @ForeignKey(() => Profession)
     @Column(DataType.INTEGER)
-    corperateId!: number;
+    professionId!: number;
 
 
 
     @AllowNull(false)
-    @ForeignKey(() => Profile)
     @Column(DataType.INTEGER)
-    profileId!: number;
-
-
-    @BelongsTo(() => Profile, { onDelete: 'CASCADE' })
-    profile!: Profile;
-
-
-    @BelongsTo(() => User, { onDelete: 'CASCADE' })
-    user!: User;
-
-
-    @BelongsTo(() => Cooperation, { onDelete: 'CASCADE' })
-    corperate!: Cooperation;
+    sectorId!: number;
 
 
 
-    // @HasMany(() => ProfessionalSector, { onDelete: 'CASCADE' })
-    // professional_sector!: ProfessionalSector[];
+    @AllowNull(true)
+    // @ForeignKey(() => Cooperation)
+    @Column(DataType.INTEGER)
+    corperateId!: number;
+
+    // @BelongsTo(() => Profession, { onDelete: 'CASCADE' })
+    // profession!: Profession;
+
+
+    // @BelongsTo(() => User, { onDelete: 'CASCADE' })
+    // user!: User;
+
+
+    // @BelongsTo(() => Cooperation, { onDelete: 'CASCADE' })
+    // corperate!: Cooperation;
 
 
     // @HasMany(() => Review, { onDelete: 'CASCADE' })

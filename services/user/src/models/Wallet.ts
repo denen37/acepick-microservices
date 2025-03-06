@@ -15,13 +15,13 @@ export class Wallet extends Model {
     @Default(0)
     @AllowNull(false)
     @Column(DataType.INTEGER)
-    amount!: string;
+    amount!: number;
 
 
     @Default(0)
     @AllowNull(false)
     @Column(DataType.INTEGER)
-    transitAmount!: string
+    transitAmount!: number
 
 
     @AllowNull(true)

@@ -7,7 +7,9 @@ import cors from 'cors';
 import { isAuthorized } from './middlewares/authorize';
 import index from './routes/index';
 import auth from './routes/auth';
+import profiles from './routes/profiles'
 import "reflect-metadata";
+// import { consumeJobEvents } from './utils'
 
 const app = express();
 
@@ -18,9 +20,13 @@ app.get('/', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Hello, world! This is the user service' });
 });
 
-app.all('*', isAuthorized);
+
+// app.all('*', isAuthorized);
 app.use("/api", index);
-app.use("/api", auth);
+app.use("/api/auth/", auth);
+app.use('/api/profiles', profiles)
+
+// consumeJobEvents();
 
 
 db.sync({ alter: true }).then(() => {

@@ -1,6 +1,6 @@
 // Import packages
 import { Router } from 'express';
-import { ProfAccountInfo, /*accountInfo, accountSingleInfo,*/ changePassword, corperateReg, deleteUsers, login, passwordChange, register, registerStepThree, registerStepTwo, sendOtp, swithAccount, updateFcmToken, updateProfessional, updateProfile, verifyBvnDetail, verifyOtp } from '../controllers/auth';
+import {/* ProfAccountInfo, accountInfo, accountSingleInfo,*/ changePassword, corperateReg, deleteUsers, login, passwordChange, register, registerStepThree, registerStepTwo, sendOtp, swithAccount, updateFcmToken, /*updateProfessional*/ updateProfile, verifyBvnDetail, verifyOtp } from '../controllers/auth';
 import { uploads } from '../utils/upload';
 
 
@@ -16,9 +16,9 @@ routes.post('/send-otp', sendOtp);
 routes.get('/switch', swithAccount);
 // routes.get('/profile/:id', accountSingleInfo)
 routes.post('/update-profile', updateProfile);
-routes.post('/update-professional', updateProfessional);
-routes.get('/professional/profile', ProfAccountInfo);
-routes.post('/corperate', ProfAccountInfo);
+// routes.post('/update-professional', updateProfessional);
+// routes.get('/professional/profile', ProfAccountInfo);
+// routes.post('/corperate', ProfAccountInfo);
 routes.post('/register', register);
 routes.post('/register-steptwo', uploads.single('avatar'), registerStepTwo);
 routes.post('/prof-register-stepthree', registerStepThree);

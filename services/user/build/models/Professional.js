@@ -11,9 +11,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Professional = exports.WorkType = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
-const User_1 = require("./User");
-const Profile_1 = require("./Profile");
-const Cooperation_1 = require("./Cooperation");
+// import { User } from './User';
+// import { Profession } from './Profession';
+// import { Profile } from './Profile';
+// import { Cooperation } from './Cooperation';
+// import { Review } from './Review';
 // export enum UserGender {
 // 	MALE = 'MALE',
 // 	FEMALE = 'FEMALE',
@@ -43,10 +45,10 @@ __decorate([
     __metadata("design:type", Object)
 ], Professional.prototype, "chargeFrom", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Default)({ "language": ["English"] }),
+    (0, sequelize_typescript_1.Default)("English"),
     (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.JSON),
-    __metadata("design:type", Object)
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING(100)),
+    __metadata("design:type", String)
 ], Professional.prototype, "language", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(true),
@@ -136,35 +138,29 @@ __decorate([
     __metadata("design:type", Object)
 ], Professional.prototype, "online", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.UUID),
     __metadata("design:type", String)
 ], Professional.prototype, "userId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.ForeignKey)(() => Cooperation_1.Cooperation),
+    (0, sequelize_typescript_1.AllowNull)(false)
+    // @ForeignKey(() => Profession)
+    ,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
+], Professional.prototype, "professionId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
+], Professional.prototype, "sectorId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(true)
+    // @ForeignKey(() => Cooperation)
+    ,
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
     __metadata("design:type", Number)
 ], Professional.prototype, "corperateId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.ForeignKey)(() => Profile_1.Profile),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", Number)
-], Professional.prototype, "profileId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Profile_1.Profile, { onDelete: 'CASCADE' }),
-    __metadata("design:type", Profile_1.Profile)
-], Professional.prototype, "profile", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { onDelete: 'CASCADE' }),
-    __metadata("design:type", User_1.User)
-], Professional.prototype, "user", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Cooperation_1.Cooperation, { onDelete: 'CASCADE' }),
-    __metadata("design:type", Cooperation_1.Cooperation)
-], Professional.prototype, "corperate", void 0);
 exports.Professional = Professional = __decorate([
     (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'professional' })
 ], Professional);

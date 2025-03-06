@@ -14,6 +14,7 @@ type Config = {
     PUBLIC_ROUTES: string[] | [];
     REDIS_INSTANCE_URL: string | undefined;
     PAYSTACK_SECRET: string | undefined;
+    RABBITMQ_URL: string | undefined;
 };
 
 const getConfig = (): Config => {
@@ -28,6 +29,7 @@ const getConfig = (): Config => {
         DB_DIALECT: process.env.DB_DIALECT,
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
+        RABBITMQ_URL: process.env.RABBITMQ_URL,
         PUBLIC_ROUTES: [
             '/api',
             '/',
@@ -64,6 +66,7 @@ const getSanitzedConfig = (config: Config) => {
     }
     return config as Config;
 };
+
 
 const config = getConfig();
 const sanitizedConfig = getSanitzedConfig(config);

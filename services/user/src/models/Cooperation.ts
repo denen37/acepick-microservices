@@ -1,7 +1,5 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { User } from './User';
-import { Profession } from './Profession';
-import { Sector } from './Sector';
 import { Profile } from './Profile';
 
 

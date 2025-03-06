@@ -1,6 +1,18 @@
 import { Sequelize } from "sequelize-typescript";
 import config from "./configSetup";
 import path from "path";
+import { Certification } from "../models/Certification";
+import { Cooperation } from "../models/Cooperation";
+import { Education } from "../models/Education";
+import { Experience } from "../models/Experience";
+import { LanLog } from "../models/LanLog";
+import { Portfolio } from "../models/Portfolio";
+import { Professional } from "../models/Professional";
+import { Profile } from "../models/Profile";
+import { User } from "../models/User";
+import { Verify } from "../models/Verify";
+import { VoiceRecording } from "../models/VoiceRecording";
+import { Wallet } from "../models/Wallet";
 
 
 const sequelize = new Sequelize(
@@ -15,7 +27,8 @@ const sequelize = new Sequelize(
             ssl: false,
         },
         logging: false,
-        models: [path.resolve(__dirname, "../models")],
+        // models: [path.resolve(__dirname, "../models")],
+        models: [Certification, Cooperation, Education, Experience, LanLog, Portfolio, Professional, Profile, User, Verify, VoiceRecording, Wallet]
     }
 );
 

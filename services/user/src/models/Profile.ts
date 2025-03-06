@@ -1,10 +1,10 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { User } from './User';
-import { Professional } from './Professional';
+// import { Professional } from './Professional';
 import { LanLog } from './LanLog';
 import { VoiceRecording } from './VoiceRecording';
 // import { Review } from './Review';
-import { ProfessionalSector } from './ProfessionalSector';
+// import { ProfessionalSector } from './ProfessionalSector';
 // import { MarketPlace } from './Market';
 
 
@@ -138,9 +138,11 @@ export class Profile extends Model {
     totalDisputes!: string;
 
 
+
     @AllowNull(false)
     @Column(DataType.STRING)
     bvn!: string;
+
 
 
     @Default(ProfileType.CLIENT)
@@ -149,10 +151,12 @@ export class Profile extends Model {
 
 
 
+
     @Default(false)
     @AllowNull(true)
     @Column(DataType.BOOLEAN)
     corperate!: any;
+
 
 
     @Default(false)
@@ -191,8 +195,8 @@ export class Profile extends Model {
     user!: User;
 
 
-    @HasOne(() => Professional)
-    professional!: Professional;
+    // @HasOne(() => Professional)
+    // professional!: Professional;
 
 
     // @HasOne(() => MarketPlace)
@@ -204,10 +208,7 @@ export class Profile extends Model {
     recording!: VoiceRecording[];
 
 
-    @HasMany(() => ProfessionalSector, { onDelete: 'CASCADE' })
-    professional_sector!: ProfessionalSector[];
-
-
-
+    // @HasMany(() => ProfessionalSector, { onDelete: 'CASCADE' })
+    // professional_sector!: ProfessionalSector[];
 
 }

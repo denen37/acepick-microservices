@@ -24,13 +24,13 @@ __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Wallet.prototype, "amount", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Wallet.prototype, "transitAmount", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),

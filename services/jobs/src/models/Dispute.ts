@@ -1,8 +1,8 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey } from 'sequelize-typescript';
-import { Profile } from './Profile';
-import { Wallet } from './Wallet';
-import { LanLog } from './LanLog';
-import { User } from './User';
+// import { Profile } from './Profile';
+// import { Wallet } from './Wallet';
+// import { LanLog } from './LanLog';
+// import { User } from './User';
 import { Job } from './Job';
 
 
@@ -44,14 +44,14 @@ export class Dispute extends Model {
 
 
 
-    @ForeignKey(() => User)
+    // @ForeignKey(() => User)
     @AllowNull(true)
     @Column(DataType.UUID)
     reporterId!: string;
 
 
 
-    @ForeignKey(() => User)
+    // @ForeignKey(() => User)
     @AllowNull(true)
     @Column(DataType.UUID)
     partnerId!: string;
@@ -63,15 +63,11 @@ export class Dispute extends Model {
 
 
 
-    @BelongsTo(() => User, { onDelete: 'CASCADE', foreignKey: 'reporterId', as: 'reporter', })
-    reporter!: User;
+    // @BelongsTo(() => User, { onDelete: 'CASCADE', foreignKey: 'reporterId', as: 'reporter', })
+    // reporter!: User;
 
 
-    @BelongsTo(() => User, { onDelete: 'CASCADE', foreignKey: 'partnerId', as: 'partner', })
-    partner!: User;
-
-
-
-
+    // @BelongsTo(() => User, { onDelete: 'CASCADE', foreignKey: 'partnerId', as: 'partner', })
+    // partner!: User;
 
 }

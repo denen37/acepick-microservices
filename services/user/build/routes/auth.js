@@ -14,9 +14,9 @@ routes.post('/send-otp', auth_1.sendOtp);
 routes.get('/switch', auth_1.swithAccount);
 // routes.get('/profile/:id', accountSingleInfo)
 routes.post('/update-profile', auth_1.updateProfile);
-routes.post('/update-professional', auth_1.updateProfessional);
-routes.get('/professional/profile', auth_1.ProfAccountInfo);
-routes.post('/corperate', auth_1.ProfAccountInfo);
+// routes.post('/update-professional', updateProfessional);
+// routes.get('/professional/profile', ProfAccountInfo);
+// routes.post('/corperate', ProfAccountInfo);
 routes.post('/register', auth_1.register);
 routes.post('/register-steptwo', upload_1.uploads.single('avatar'), auth_1.registerStepTwo);
 routes.post('/prof-register-stepthree', auth_1.registerStepThree);

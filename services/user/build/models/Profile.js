@@ -12,10 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Profile = exports.ProfileType = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = require("./User");
-const Professional_1 = require("./Professional");
 const VoiceRecording_1 = require("./VoiceRecording");
 // import { Review } from './Review';
-const ProfessionalSector_1 = require("./ProfessionalSector");
+// import { ProfessionalSector } from './ProfessionalSector';
 // import { MarketPlace } from './Market';
 // export enum UserGender {
 // 	MALE = 'MALE',
@@ -168,17 +167,9 @@ __decorate([
     __metadata("design:type", User_1.User)
 ], Profile.prototype, "user", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => Professional_1.Professional),
-    __metadata("design:type", Professional_1.Professional)
-], Profile.prototype, "professional", void 0);
-__decorate([
     (0, sequelize_typescript_1.HasMany)(() => VoiceRecording_1.VoiceRecording, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)
 ], Profile.prototype, "recording", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasMany)(() => ProfessionalSector_1.ProfessionalSector, { onDelete: 'CASCADE' }),
-    __metadata("design:type", Array)
-], Profile.prototype, "professional_sector", void 0);
 exports.Profile = Profile = __decorate([
     (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'profile' })
 ], Profile);

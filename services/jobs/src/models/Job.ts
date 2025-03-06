@@ -1,11 +1,11 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey } from 'sequelize-typescript';
-import { Profile } from './Profile';
-import { Wallet } from './Wallet';
-import { LanLog } from './LanLog';
-import { User } from './User';
-import { Dispute } from './Dispute';
+// import { Profile } from './Profile';
+// import { Wallet } from './Wallet';
+// import { LanLog } from './LanLog';
+// import { User } from './User';
+// import { Dispute } from './Dispute';
 // import { Material } from './Material';
-import { VoiceRecording } from './VoiceRecording';
+// import { VoiceRecording } from './VoiceRecording';
 
 
 // export enum UserGender {
@@ -266,16 +266,22 @@ export class Job extends Model {
     status!: JobStatus;
 
 
-    @ForeignKey(() => User)
+    // @ForeignKey(() => User)
     @AllowNull(true)
     @Column(DataType.UUID)
     ownerId!: string;
 
 
-    @ForeignKey(() => User)
+    // @ForeignKey(() => User)
     @AllowNull(true)
     @Column(DataType.UUID)
     userId!: string;
+
+    
+
+    @AllowNull(true)
+    @Column(DataType.INTEGER)
+    sectorId!: string;
 
 
 
@@ -289,16 +295,16 @@ export class Job extends Model {
 
 
     // relationships
-    @BelongsTo(() => User, { foreignKey: 'userId', as: 'client', onDelete: 'CASCADE', })
-    @ForeignKey(() => User)
-    client!: User;
+    // @BelongsTo(() => User, { foreignKey: 'userId', as: 'client', onDelete: 'CASCADE', })
+    // @ForeignKey(() => User)
+    // client!: User;
 
-    @BelongsTo(() => User, { foreignKey: 'ownerId', as: 'owner', onDelete: 'CASCADE', })
-    @ForeignKey(() => User)
-    owner!: User;
+    // @BelongsTo(() => User, { foreignKey: 'ownerId', as: 'owner', onDelete: 'CASCADE', })
+    // @ForeignKey(() => User)
+    // owner!: User;
 
-    @HasMany(() => Dispute, { onDelete: 'CASCADE' })
-    dispute!: Dispute[];
+    // @HasMany(() => Dispute, { onDelete: 'CASCADE' })
+    // dispute!: Dispute[];
 
 
     // @HasMany(() => VoiceRecording, { onDelete: 'CASCADE' })

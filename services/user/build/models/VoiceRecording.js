@@ -13,17 +13,6 @@ exports.VoiceRecording = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const Profile_1 = require("./Profile");
 const User_1 = require("./User");
-// export enum UserGender {
-// 	MALE = 'MALE',
-// 	FEMALE = 'FEMALE',
-// 	OTHER = 'OTHER',
-// }
-// export enum JobStatus {
-// 	COMPLETED = 'COMPLETED',
-// 	DISPUTED = 'DISPUTED',
-// 	PENDING = 'PENDING',
-// 	REJECTED = 'REJECTED',
-// }
 let VoiceRecording = class VoiceRecording extends sequelize_typescript_1.Model {
 };
 exports.VoiceRecording = VoiceRecording;
@@ -34,8 +23,8 @@ __decorate([
 ], VoiceRecording.prototype, "url", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
-    __metadata("design:type", String)
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
 ], VoiceRecording.prototype, "duration", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
@@ -56,13 +45,11 @@ __decorate([
     __metadata("design:type", Number)
 ], VoiceRecording.prototype, "profileId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { foreignKey: 'userId', as: 'user', onDelete: 'CASCADE', }),
-    (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
+    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { foreignKey: 'userId', as: 'user', onDelete: 'CASCADE' }),
     __metadata("design:type", User_1.User)
 ], VoiceRecording.prototype, "user", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { foreignKey: 'recieverId', as: 'reciever', onDelete: 'CASCADE', }),
-    (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
+    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { foreignKey: 'recieverId', as: 'reciever', onDelete: 'CASCADE' }),
     __metadata("design:type", User_1.User)
 ], VoiceRecording.prototype, "reciever", void 0);
 __decorate([

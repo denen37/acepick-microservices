@@ -57,6 +57,7 @@ const getConfig = () => {
         TOKEN_SECRET: process.env.TOKEN_SECRET || 'supersecret',
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
+        RABBITMQ_URL: process.env.RABBITMQ_URL,
         PUBLIC_ROUTES: [
             '/api',
             '/',

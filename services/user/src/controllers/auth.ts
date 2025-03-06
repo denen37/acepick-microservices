@@ -7,11 +7,11 @@ import { UserState, UserStatus, User } from "../models/User";
 import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { Profile, ProfileType } from "../models/Profile";
-import { Professional } from "../models/Professional";
+// import { Professional } from "../models/Professional";
 import { Wallet, WalletType } from "../models/Wallet";
 import { LanLog } from "../models/LanLog";
-import { Sector } from "../models/Sector";
-import { Profession } from "../models/Profession";
+// import { Sector } from "../models/Sector";
+// import { Profession } from "../models/Profession";
 import { Cooperation } from "../models/Cooperation";
 // import { Review } from "../models/Review";
 import { verifyBvn } from "../services/bvn";
@@ -19,16 +19,16 @@ import { compareTwoStrings } from 'string-similarity';
 
 // yarn add stream-chat
 import { StreamChat } from 'stream-chat';
-import { JobStatus, Job } from "../models/Job";
+// import { JobStatus, Job } from "../models/Job";
 import { Education } from "../models/Education";
 import { Certification } from "../models/Certification";
 import { Experience } from "../models/Experience";
 import { Portfolio } from "../models/Portfolio";
-import { Dispute } from "../models/Dispute";
+// import { Dispute } from "../models/Dispute";
 // import { CreditType, TransactionType, Transactions } from "../models/Transaction";
 import { Sequelize } from "sequelize-typescript";
 import { Redis } from "../services/redis";
-import { ProfessionalSector } from "../models/ProfessionalSector";
+// import { ProfessionalSector } from "../models/ProfessionalSector";
 import { Op } from "sequelize";
 import { sendExpoNotification } from "../services/expo";
 
@@ -62,17 +62,17 @@ export const updateProfile = async (req: Request, res: Response) => {
 
 
 
-export const updateProfessional = async (req: Request, res: Response) => {
-    let { intro, language } = req.body;
-    let { id } = req.user;
-    const professional = await Professional.findOne({ where: { userId: id } })
-    await professional?.update({
-        intro: intro ?? professional.intro,
-        language: language ?? professional.language
-    })
-    const updated = await Professional.findOne({ where: { userId: id } })
-    return successResponse(res, "Updated Successfully", updated)
-}
+// export const updateProfessional = async (req: Request, res: Response) => {
+//     let { intro, language } = req.body;
+//     let { id } = req.user;
+//     const professional = await Professional.findOne({ where: { userId: id } })
+//     await professional?.update({
+//         intro: intro ?? professional.intro,
+//         language: language ?? professional.language
+//     })
+//     const updated = await Professional.findOne({ where: { userId: id } })
+//     return successResponse(res, "Updated Successfully", updated)
+// }
 
 
 
@@ -369,112 +369,137 @@ export const passwordChange = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     let { email, password, type, fcmToken } = req.body;
+
     const user = await User.findOne({ where: { email } })
+
     if (!user) return errorResponse(res, "Failed", { status: false, message: "User does not exist" })
+
     const match = await compare(password, user.password)
+
     if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Credentials" })
+
     let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
+
     const chatToken = serverClient.createToken(`${String(user.id)}`);
+
     const profile = await Profile.findOne({ where: { userId: user.id } })
+
     await profile?.update({ fcmToken })
-    const profileUpdated = await Profile.findOne({ where: { userId: user.id } })
+
+    const profileUpdated = await Profile.findOne({
+        where: { userId: user.id },
+        include: [{
+            model: User,
+            attributes: ['id', 'email', 'phone', 'fcmToken', 'status'],
+            include: [{
+                model: Wallet
+            }]
+        }]
+    })
+
+
+    return successResponse(res, "Successful", { status: true, profile: profileUpdated, token, chatToken })
+
+
     // profile?.fcmToken == null ? null : sendExpoNotification(profileUpdated!.fcmToken, "hello world");
-    if (profile?.type == ProfileType.CLIENT) {
-        if (type == profile?.type) {
-            const response = await serverClient.upsertUsers([{
-                id: String(user.id),
-                role: 'admin',
-                mycustomfield: {
-                    email: `${user.email}`,
-                    accountType: profile?.type,
-                    userId: String(user.id),
-                }
-            }]);
-            return successResponse(res, "Successful", { status: true, message: { ...user.dataValues, token, chatToken } })
+
+    // if (profile?.type == ProfileType.CLIENT) {
+    //     if (type == profile?.type) {
+    //         const response = await serverClient.upsertUsers([{
+    //             id: String(user.id),
+    //             role: 'admin',
+    //             mycustomfield: {
+    //                 email: `${user.email}`,
+    //                 accountType: profile?.type,
+    //                 userId: String(user.id),
+    //             }
+    //         }]);
+    //         return successResponse(res, "Successful", { status: true, message: { ...user.dataValues, token, chatToken } })
 
 
-        } else {
-            return successResponseFalse(res, "Cannot access Client account")
-        }
+    //     } else {
+    //         return successResponseFalse(res, "Cannot access Client account")
+    //     }
 
 
-    } else {
-        if (type == profile?.type) {
-            const professionalProfile = await Professional.findAll(
-                {
-                    order: [
-                        ['id', 'DESC']
-                    ],
-                    include: [
+    // } else {
+    //     if (type == profile?.type) {
+    //         const professionalProfile = await Professional.findAll(
+    //             {
+    //                 order: [
+    //                     ['id', 'DESC']
+    //                 ],
+    //                 include: [
 
-                        { model: Cooperation },
-                        {
-                            model: Profile,
-                            where: { userId: profile?.userId },
-                            include: [
+    //                     { model: Cooperation },
+    //                     {
+    //                         model: Profile,
+    //                         where: { userId: profile?.userId },
+    //                         include: [
 
-                                {
-                                    model: User,
-                                    attributes: [
-                                        'createdAt', 'updatedAt', "email", "phone"],
-                                    include: [{
-                                        model: Wallet,
-                                        where: {
-                                            type: WalletType.PROFESSIONAL
-                                        }
-                                    },
+    //                             {
+    //                                 model: User,
+    //                                 attributes: [
+    //                                     'createdAt', 'updatedAt', "email", "phone"],
+    //                                 include: [{
+    //                                     model: Wallet,
+    //                                     where: {
+    //                                         type: WalletType.PROFESSIONAL
+    //                                     }
+    //                                 },
 
-                                    {
-                                        model: Education,
-                                    },
-                                    {
-                                        model: Certification,
-                                    },
-                                    {
-                                        model: Experience,
-                                    },
-                                    {
-                                        model: Portfolio,
-                                        order: [
-                                            ['id', 'DESC'],
-                                        ],
-                                    },
+    //                                 {
+    //                                     model: Education,
+    //                                 },
+    //                                 {
+    //                                     model: Certification,
+    //                                 },
+    //                                 {
+    //                                     model: Experience,
+    //                                 },
+    //                                 {
+    //                                     model: Portfolio,
+    //                                     order: [
+    //                                         ['id', 'DESC'],
+    //                                     ],
+    //                                 },
 
 
 
-                                    ]
-                                },
+    //                                 ]
+    //                             },
 
-                            ],
-                        }
-                    ],
-                }
-            )
-            let data = deleteKey(professionalProfile[0].dataValues, "profile", "corperate");
+    //                         ],
+    //                     }
+    //                 ],
+    //             }
+    //         )
 
-            let mergedObj = {
-                profile: professionalProfile[0].dataValues.profile,
-                professional: { ...data },
-                corperate: professionalProfile[0].dataValues.corperate,
-            }
+    //         let data = deleteKey(professionalProfile[0].dataValues, "profile", "corperate");
 
-            const response = await serverClient.upsertUsers([{
-                id: String(user.id),
-                role: 'admin',
-                // mycustomfield: {
-                //   email: `${user.email}`,
-                //   accountType: profile?.type,
-                //   data: mergedObj
-                // }
-            }]);
-            return successResponse(res, "Successful", { status: true, message: { ...user.dataValues, token, chatToken } })
-        }
+    //         let mergedObj = {
+    //             profile: professionalProfile[0].dataValues.profile,
+    //             professional: { ...data },
+    //             corperate: professionalProfile[0].dataValues.corperate,
+    //         }
 
-        else {
-            return successResponseFalse(res, "Cannot access Professional account")
-        }
+    //         const response = await serverClient.upsertUsers([{
+    //             id: String(user.id),
+    //             role: 'admin',
+    //             // mycustomfield: {
+    //             //   email: `${user.email}`,
+    //             //   accountType: profile?.type,
+    //             //   data: mergedObj
+    //             // }
+    //         }]);
+    //         return successResponse(res, "Successful", { status: true, message: { ...user.dataValues, token, chatToken } })
+    //     }
 
-    }
+    //     else {
+    //         return successResponseFalse(res, "Cannot access Professional account")
+    //     }
+
+    // }
 }
 
 
@@ -516,22 +541,22 @@ export const registerStepThree = async (req: Request, res: Response) => {
     let { intro, regNum, experience, sectorId, professionId, chargeFrom } = req.body;
     let { id } = req.user;
     const user = await User.findOne({ where: { id } });
-    const professional = await Professional.findOne({ where: { userId: id } });
-    if (professional) return errorResponse(res, "Failed", { status: false, message: "Professional Already Exist" })
+    // const professional = await Professional.findOne({ where: { userId: id } });
+    // if (professional) return errorResponse(res, "Failed", { status: false, message: "Professional Already Exist" })
 
-    const profile = await Profile.findOne({ where: { userId: id } });
-    const professionalCreate = await Professional.create({
-        profileId: profile?.id, intro, regNum, yearsOfExp: experience, chargeFrom,
-        file: { images: [] }, userId: id
-    })
-    const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
-    await ProfessionalSector.create({
-        userId: id, sectorId, professionId, profileId: profile?.id,
-        yearsOfExp: experience, default: true, chargeFrom
-    })
-    await profile?.update({ type: ProfileType.PROFESSIONAL, corperate: false, switch: true })
-    await user?.update({ state: UserState.VERIFIED })
-    successResponse(res, "Successful", professionalCreate)
+    // const profile = await Profile.findOne({ where: { userId: id } });
+    // const professionalCreate = await Professional.create({
+    //     profileId: profile?.id, intro, regNum, yearsOfExp: experience, chargeFrom,
+    //     file: { images: [] }, userId: id
+    // })
+    // const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
+    // await ProfessionalSector.create({
+    //     userId: id, sectorId, professionId, profileId: profile?.id,
+    //     yearsOfExp: experience, default: true, chargeFrom
+    // })
+    // await profile?.update({ type: ProfileType.PROFESSIONAL, corperate: false, switch: true })
+    // await user?.update({ state: UserState.VERIFIED })
+    // successResponse(res, "Successful", professionalCreate)
 }
 
 
@@ -547,11 +572,11 @@ export const corperateReg = async (req: Request, res: Response) => {
         nameOfOrg, phone, address, state, lga, postalCode, regNum, noOfEmployees, profileId: profile?.id,
         userId: id
     })
-    const prof = await Professional.findOne({ where: { userId: id } })
-    await profile?.update({ corperate: true, fullName: nameOfOrg })
-    await prof?.update({ corperateId: coorperateCreate.id })
-    await user?.update({ state: UserState.VERIFIED })
-    successResponse(res, "Successful", coorperateCreate)
+    // const prof = await Professional.findOne({ where: { userId: id } })
+    // await profile?.update({ corperate: true, fullName: nameOfOrg })
+    // await prof?.update({ corperateId: coorperateCreate.id })
+    // await user?.update({ state: UserState.VERIFIED })
+    // successResponse(res, "Successful", coorperateCreate)
 }
 
 
@@ -616,47 +641,47 @@ export const changePassword = async (req: Request, res: Response) => {
 
 
 
-export const ProfAccountInfo = async (req: Request, res: Response) => {
-    const { id } = req.user;
-    const profile = await Professional.findOne(
-        {
-            where: { userId: id },
-            attributes: {
-                exclude: []
-            },
-            include: [
-                {
-                    model: User,
-                    attributes: [
-                        "email", "phone"], include: [{
-                            model: Wallet,
-                            where: {
-                                type: WalletType.PROFESSIONAL
-                            }
-                        }]
-                },
-                {
-                    model: Cooperation,
-                },
+// export const ProfAccountInfo = async (req: Request, res: Response) => {
+//     const { id } = req.user;
+//     const profile = await Professional.findOne(
+//         {
+//             where: { userId: id },
+//             attributes: {
+//                 exclude: []
+//             },
+//             include: [
+//                 {
+//                     model: User,
+//                     attributes: [
+//                         "email", "phone"], include: [{
+//                             model: Wallet,
+//                             where: {
+//                                 type: WalletType.PROFESSIONAL
+//                             }
+//                         }]
+//                 },
+//                 {
+//                     model: Cooperation,
+//                 },
 
-                {
-                    model: Profile,
-                    attributes: [
-                        'createdAt', 'updatedAt', "fullName", "avatar", "lga", "state", "address", "bvn", "type"],
-                    include: [{
-                        model: ProfessionalSector, include: [
-                            { model: Sector },
-                            { model: Profession },
-                        ]
-                    },]
-                }
-            ],
+//                 {
+//                     model: Profile,
+//                     attributes: [
+//                         'createdAt', 'updatedAt', "fullName", "avatar", "lga", "state", "address", "bvn", "type"],
+//                     include: [{
+//                         model: ProfessionalSector, include: [
+//                             { model: Sector },
+//                             { model: Profession },
+//                         ]
+//                     },]
+//                 }
+//             ],
 
-        }
-    )
-    if (!profile) return errorResponse(res, "Failed", { status: false, message: "Profile Does'nt exist" })
-    return successResponse(res, "Successful", profile)
-};
+//         }
+//     )
+//     if (!profile) return errorResponse(res, "Failed", { status: false, message: "Profile Does'nt exist" })
+//     return successResponse(res, "Successful", profile)
+// };
 
 
 
