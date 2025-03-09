@@ -11,10 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Professional = exports.WorkType = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
-// import { User } from './User';
+const User_1 = require("./User");
 // import { Profession } from './Profession';
 // import { Profile } from './Profile';
-// import { Cooperation } from './Cooperation';
+const Cooperation_1 = require("./Cooperation");
 // import { Review } from './Review';
 // export enum UserGender {
 // 	MALE = 'MALE',
@@ -138,6 +138,7 @@ __decorate([
     __metadata("design:type", Object)
 ], Professional.prototype, "online", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.UUID),
     __metadata("design:type", String)
@@ -155,12 +156,19 @@ __decorate([
     __metadata("design:type", Number)
 ], Professional.prototype, "sectorId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(true)
-    // @ForeignKey(() => Cooperation)
-    ,
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.ForeignKey)(() => Cooperation_1.Cooperation),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
     __metadata("design:type", Number)
 ], Professional.prototype, "corperateId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { onDelete: 'CASCADE' }),
+    __metadata("design:type", User_1.User)
+], Professional.prototype, "user", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Cooperation_1.Cooperation, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Cooperation_1.Cooperation)
+], Professional.prototype, "corperate", void 0);
 exports.Professional = Professional = __decorate([
     (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'professional' })
 ], Professional);

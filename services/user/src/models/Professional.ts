@@ -1,8 +1,8 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey } from 'sequelize-typescript';
-// import { User } from './User';
+import { User } from './User';
 // import { Profession } from './Profession';
 // import { Profile } from './Profile';
-// import { Cooperation } from './Cooperation';
+import { Cooperation } from './Cooperation';
 // import { Review } from './Review';
 
 
@@ -141,7 +141,7 @@ export class Professional extends Model {
 
 
 
-    // @ForeignKey(() => User)
+    @ForeignKey(() => User)
     @AllowNull(false)
     @Column(DataType.UUID)
     userId!: string;
@@ -160,7 +160,7 @@ export class Professional extends Model {
 
 
     @AllowNull(true)
-    // @ForeignKey(() => Cooperation)
+    @ForeignKey(() => Cooperation)
     @Column(DataType.INTEGER)
     corperateId!: number;
 
@@ -168,12 +168,12 @@ export class Professional extends Model {
     // profession!: Profession;
 
 
-    // @BelongsTo(() => User, { onDelete: 'CASCADE' })
-    // user!: User;
+    @BelongsTo(() => User, { onDelete: 'CASCADE' })
+    user!: User;
 
 
-    // @BelongsTo(() => Cooperation, { onDelete: 'CASCADE' })
-    // corperate!: Cooperation;
+    @BelongsTo(() => Cooperation, { onDelete: 'CASCADE' })
+    corperate!: Cooperation;
 
 
     // @HasMany(() => Review, { onDelete: 'CASCADE' })

@@ -1,5 +1,6 @@
 import amqplib from "amqplib";
 import config from '../config/configSetup'
+import { randomUUID } from "crypto";
 
 const RABBITMQ_URL = config.RABBITMQ_URL || "amqp://localhost:5672";
 let amqplibConnection: any = null;
@@ -26,18 +27,28 @@ export async function PublishMessage(
     reply: { replyTo: string; correlationId: string } | null,
     replyHandler: ((msg: any) => void) | null
 ) {
-    let channel = await CreateChannel(queueName);
+    const channel = await CreateChannel(queueName);
 
-    const options = reply ? { replyTo: reply.replyTo, correlationId: reply.correlationId } : undefined;
+    const replyQueue = reply?.replyTo || `reply_queue_${randomUUID()}`;
+
+    await channel.assertQueue(replyQueue, { durable: false, autoDelete: false });
+
+    const options = reply ? reply : undefined;
 
     channel.sendToQueue(queueName, Buffer.from(JSON.stringify(msg)), options);
 
-    if (options) {
-        await channel.assertQueue(options.replyTo, { durable: false, exclusive: true });
+    console.log('hasReply', reply);
 
-        channel.consume(options.replyTo, (msg: any) => {
-            if (msg && msg.properties.correlationId === options.correlationId) {
-                if (replyHandler) replyHandler(msg);
+
+    // Set up a single consumer per reply queue
+    if (replyHandler && reply) {
+        channel.consume(replyQueue, (msg) => {
+            try {
+                if (msg) {
+                    replyHandler(JSON.parse(msg.content.toString()));
+                }
+            } catch (error) {
+                console.error("Error processing message:", error);
             }
         }, { noAck: true });
     }

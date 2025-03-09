@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = exports.UserState = exports.UserStatus = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const uuid_1 = require("uuid");
+const Profile_1 = require("./Profile");
 // import { Profile } from './Profile';
 // import { Wallet } from './Wallet';
 // import { LanLog } from './LanLog';
@@ -91,6 +92,10 @@ __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM(UserState.STEP_ONE, UserState.STEP_TWO, UserState.STEP_THREE, UserState.VERIFIED)),
     __metadata("design:type", String)
 ], User.prototype, "state", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => Profile_1.Profile),
+    __metadata("design:type", Profile_1.Profile)
+], User.prototype, "profile", void 0);
 exports.User = User = __decorate([
     (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'users' })
 ], User);

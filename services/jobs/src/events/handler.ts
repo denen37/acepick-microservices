@@ -46,23 +46,40 @@ export async function PublishMessage(
 }
 
 
-export async function ConsumeMessage(queueName: string, action: (msg: any) => any, reply: boolean = false) {
+export async function ConsumeMessage(queueName: string, action: (msg: any) => Promise<any>, reply: boolean = false) {
     const channel = await CreateChannel(queueName);
 
     console.log(`🔗 User Service listening for ${queueName}...`);
 
     channel.consume(queueName, async (msg) => {
         if (msg) {
-            const data = JSON.parse(msg.content.toString());
+            try {
+                const data = JSON.parse(msg.content.toString());
+                const result = await action(data);
 
-            const result = action(data);
+                console.log('📩 Processing result:', result);
 
-            if (reply) {
-                const replyQueue = msg.properties.replyTo;
-                channel.sendToQueue(replyQueue, Buffer.from(result), {
-                    correlationId: msg.properties.correlationId
-                });
+                if (reply) {
+                    const replyQueue = msg.properties.replyTo;
+
+                    if (!replyQueue) {
+                        console.error("❌ No reply queue specified!");
+                        return;
+                    }
+
+                    await channel.assertQueue(replyQueue, { durable: false, exclusive: false });
+
+                    channel.sendToQueue(replyQueue, Buffer.from(JSON.stringify(result)), {
+                        correlationId: msg.properties.correlationId
+                    });
+
+                    console.log(`✅ Sent response to ${replyQueue}`);
+                }
+
+                channel.ack(msg); // Explicitly acknowledge the message
+            } catch (error) {
+                console.error(`❌ Error processing message:`, error);
             }
         }
-    }, { noAck: true });
+    }, { noAck: false });
 }

@@ -59,6 +59,18 @@ __decorate([
 ], Cooperation.prototype, "userId", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
+], Cooperation.prototype, "sectorId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false)
+    // @ForeignKey(() => Profession)
+    ,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
+], Cooperation.prototype, "professionId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.ForeignKey)(() => Profile_1.Profile),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
     __metadata("design:type", Number)

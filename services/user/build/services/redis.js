@@ -17,7 +17,7 @@ const redis_1 = require("redis");
 const configSetup_1 = __importDefault(require("../config/configSetup"));
 const client = (0, redis_1.createClient)({ url: configSetup_1.default.REDIS_INSTANCE_URL });
 //const client = createClient();
-client.on('error', (err) => console.log('Redis Client Error', err));
+client.on('error', (err) => console.log('Redis Client Error'));
 (() => __awaiter(void 0, void 0, void 0, function* () { return yield client.connect(); }))();
 class Redis {
     setData(key_1, value_1) {

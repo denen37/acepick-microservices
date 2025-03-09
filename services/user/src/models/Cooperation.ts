@@ -62,17 +62,17 @@ export class Cooperation extends Model {
 
 
     // @ForeignKey(() => Sector)
-    // @AllowNull(false)
-    // @Column(DataType.INTEGER)
-    // sectorId!: number;
+    @AllowNull(false)
+    @Column(DataType.INTEGER)
+    sectorId!: number;
 
 
 
 
-    // @AllowNull(false)
+    @AllowNull(false)
     // @ForeignKey(() => Profession)
-    // @Column(DataType.INTEGER)
-    // professionId!: number;
+    @Column(DataType.INTEGER)
+    professionId!: number;
 
 
 

@@ -1,5 +1,6 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey, PrimaryKey } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
+import { Profile } from './Profile';
 // import { Profile } from './Profile';
 // import { Wallet } from './Wallet';
 // import { LanLog } from './LanLog';
@@ -97,6 +98,9 @@ export class User extends Model {
 
     // @HasOne(() => Wallet)
     // wallet!: Wallet;
+
+    @HasOne(() => Profile)
+    profile!: Profile;
 
 
     // @ForeignKey(() => LanLog)

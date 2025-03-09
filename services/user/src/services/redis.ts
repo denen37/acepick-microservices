@@ -3,7 +3,7 @@ import config from '../config/configSetup';
 
 const client = createClient({ url: config.REDIS_INSTANCE_URL });
 //const client = createClient();
-client.on('error', (err) => console.log('Redis Client Error', err));
+client.on('error', (err) => console.log('Redis Client Error'));
 (async () => await client.connect())();
 
 export class Redis {

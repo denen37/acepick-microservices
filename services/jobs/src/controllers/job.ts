@@ -2,9 +2,9 @@ import { Request, Response } from "express"
 import { Profession } from "../models/Profession"
 import { successResponse, errorResponse } from "../utils/utility"
 import { Sector } from "../models/Sector"
-import { Job } from "../models/Job"
 import { PublishMessage } from "../events/handler"
 import { randomUUID } from "crypto";
+
 
 
 export const getProfessions = async (req: Request, res: Response) => {
@@ -20,6 +20,7 @@ export const getProfessions = async (req: Request, res: Response) => {
 
     return successResponse(res, "success", professions)
 }
+
 
 export const getSectors = async (req: Request, res: Response) => {
     let { metadata } = req.query
@@ -71,3 +72,15 @@ export const TestEvent = async (req: Request, res: Response) => {
         })
     return successResponse(res, "success", "message sent")
 }
+
+// export const get_professions = async (req: Request, res: Response) => {
+//     const profs = await Profession.findAll({
+//         where: {
+//             id: msg
+//         },
+
+//         attributes: ['id', 'title', 'image']
+//     })
+
+//     return profs.map(prof => prof.dataValues)
+// }
