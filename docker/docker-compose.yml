@@ -1,28 +1,28 @@
 services:
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx
-  #   build: .
-  #   # restart: always
-  #   ports:
-  #     - "8000:80"
-  #     - "443:443"
-  #   env_file:
-  #     - ./.env 
-  #   environment:
-  #   - ENV=${ENV}
-  #   - DOMAIN_NAME=${DOMAIN_NAME}
-  #   - BACKEND_HOST=${BACKEND_HOST}
-  #   - BACKEND_PORT=${USER_PORT}
-  #   volumes:
-  #     - ./nginx/nginx.${ENV}.conf:/etc/nginx/nginx.conf
-  #     - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
-  #     - /etc/ssl/private:/etc/nginx/ssl/private:ro 
-  #   networks:
-  #     - ace-net
-  #   depends_on:
-  #     - user
-  #     - jobs
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    build: .
+    # restart: always
+    ports:
+      - "8000:80"
+      - "443:443"
+    env_file:
+      - ./.env 
+    environment:
+    - ENV=${ENV}
+    - DOMAIN_NAME=${DOMAIN_NAME}
+    - BACKEND_HOST=${BACKEND_HOST}
+    - BACKEND_PORT=${USER_PORT}
+    volumes:
+      - ./nginx/nginx.${ENV}.conf:/etc/nginx/nginx.conf
+      - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
+      - /etc/ssl/private:/etc/nginx/ssl/private:ro 
+    networks:
+      - ace-net
+    depends_on:
+      - user
+      - jobs
 
   redis:
     image: redis:latest
@@ -52,18 +52,18 @@ services:
     networks:
       - ace-net
 
-  rabbitmq:
-    image: rabbitmq:management
-    container_name: rabbitmq
-    restart: always
-    ports:
-      - "5672:5672" 
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    networks:
-      - ace-net
+  # rabbitmq:
+  #   image: rabbitmq:management
+  #   container_name: rabbitmq
+  #   restart: always
+  #   ports:
+  #     - "5672:5672" 
+  #     - "15672:15672"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: guest
+  #     RABBITMQ_DEFAULT_PASS: guest
+  #   networks:
+  #     - ace-net
     
   user:
       build: ../services/user

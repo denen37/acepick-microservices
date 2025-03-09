@@ -20,9 +20,9 @@ app.get('/jobs/', (req: Request, res: Response) => {
 app.use('/jobs', jobRoutes);
 app.use('/jobs/services', serviceRoutes)
 
-suscribe().then(() => {
-    console.log('Event listener is running');
-});
+// suscribe().then(() => {
+//     console.log('Event listener is running');
+// });
 
 db.sync({ alter: true }).then(() => {
     app.listen(config.PORT, () => console.log(`Server is running on http://localhost:${config.PORT}`));
