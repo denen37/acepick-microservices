@@ -13,11 +13,16 @@ app.use(express.json());
 
 app.use(cors({ origin: true }));
 
+app.get('/', (req: Request, res: Response) => {
+    res.status(200).json({ message: 'Hello, world! This is the jobs service from /' });
+});
+
+
 app.get('/jobs/', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Hello, world! This is the jobs service' });
 });
 
-app.use('/jobs', jobRoutes);
+app.use('/jobs/api', jobRoutes);
 app.use('/jobs/services', serviceRoutes)
 
 // suscribe().then(() => {

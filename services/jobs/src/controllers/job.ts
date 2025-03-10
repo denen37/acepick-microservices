@@ -65,11 +65,11 @@ export const getSectors = async (req: Request, res: Response) => {
 // }
 
 export const TestEvent = async (req: Request, res: Response) => {
-    await PublishMessage('test2', { id: "123", title: "Web Development", description: "Build a website" },
-        { replyTo: "test_reply", correlationId: randomUUID() },
-        (msg) => {
-            console.log(msg.content.toString())
-        })
+    // await PublishMessage('test2', { id: "123", title: "Web Development", description: "Build a website" },
+    //     { replyTo: "test_reply", correlationId: randomUUID() },
+    //     (msg) => {
+    //         console.log(msg.content.toString())
+    //     })
     return successResponse(res, "success", "message sent")
 }
 

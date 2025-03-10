@@ -33,7 +33,7 @@ module.exports = {
                 id: 'a0a13da5-ee75-4954-a13e-32dbc7167dd3', email: 'user8@example.com', password: hashedPassword, setPin: false, fcmToken: null, phone: '4443332222', status: UserStatus.ACTIVE, state: UserState.VERIFIED, createdAt: new Date(), updatedAt: new Date(),
             },
             {
-                id: 'e69bb0bb-0bfd-417c-a64a-d501ce59c618,', email: 'user9@example.com', password: hashedPassword, setPin: false, fcmToken: null, phone: '1110009999', status: UserStatus.INACTIVE, state: UserState.STEP_ONE, createdAt: new Date(), updatedAt: new Date(),
+                id: 'e69bb0bb-0bfd-417c-a64a-d501ce59c618', email: 'user9@example.com', password: hashedPassword, setPin: false, fcmToken: null, phone: '1110009999', status: UserStatus.INACTIVE, state: UserState.STEP_ONE, createdAt: new Date(), updatedAt: new Date(),
             },
             {
                 id: 'f42f3fb5-646c-4743-afbd-de92e97ecf98', email: 'user10@example.com', password: hashedPassword, setPin: false, fcmToken: null, phone: '2223334444', status: UserStatus.ACTIVE, state: UserState.STEP_TWO, createdAt: new Date(), updatedAt: new Date(),
