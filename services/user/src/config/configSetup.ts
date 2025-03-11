@@ -21,6 +21,8 @@ type Config = {
     PAYSTACK_SECRET: string | undefined;
     RABBITMQ_URL: string | undefined;
     TOKEN_SECRET: string;
+    INTERNAL_HOST: string | undefined;
+    JOBS_PORT: number | undefined;
 };
 
 const getConfig = (): Config => {
@@ -42,6 +44,8 @@ const getConfig = (): Config => {
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
         RABBITMQ_URL: process.env.RABBITMQ_URL,
+        INTERNAL_HOST: process.env.INTERNAL_HOST,
+        JOBS_PORT: Number(process.env.JOBS_PORT),
         PUBLIC_ROUTES: [
             '/api',
             '/',
