@@ -2,16 +2,16 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 import { v4 as uuidv4 } from 'uuid';
 import { Profile } from './Profile';
 // import { Profile } from './Profile';
-// import { Wallet } from './Wallet';
-// import { LanLog } from './LanLog';
+import { Wallet } from './Wallet';
+import { LanLog } from './LanLog';
 // import { Profession } from './Profession';
 // import { Jobs } from './Jobs';
 // import { Review } from './Review';
-// import { Education } from './Education';
-// import { Experience } from './Experience';
+import { Education } from './Education';
+import { Experience } from './Experience';
 // import { Certificate } from 'crypto';
-// import { Porfolio } from './Porfolio';
-// import { Certification } from './Certification';
+import { Portfolio } from './Portfolio';
+import { Certification } from './Certification';
 // import { Dispute } from './Dispute';
 // import Sequelize from 'sequelize/types/sequelize';
 
@@ -90,28 +90,28 @@ export class User extends Model {
     state!: UserState;
 
 
-    // @ForeignKey(() => Wallet)
-    // @AllowNull(true)
-    // @Column(DataType.INTEGER)
-    // walletId!: number;
+    @ForeignKey(() => Wallet)
+    @AllowNull(true)
+    @Column(DataType.INTEGER)
+    walletId!: number;
 
 
-    // @HasOne(() => Wallet)
-    // wallet!: Wallet;
+    @HasOne(() => Wallet)
+    wallet!: Wallet;
 
     @HasOne(() => Profile)
     profile!: Profile;
 
 
-    // @ForeignKey(() => LanLog)
-    // @AllowNull(true)
-    // @Column(DataType.INTEGER)
-    // locationId!: number;
+    @ForeignKey(() => LanLog)
+    @AllowNull(true)
+    @Column(DataType.INTEGER)
+    locationId!: number;
 
 
 
-    // @HasOne(() => LanLog)
-    // location!: LanLog;
+    @HasOne(() => LanLog)
+    location!: LanLog;
 
 
 
@@ -138,22 +138,22 @@ export class User extends Model {
 
 
 
-    // @HasMany(() => Education, { onDelete: 'CASCADE' })
-    // education!: Education[];
+    @HasMany(() => Education, { onDelete: 'CASCADE' })
+    education!: Education[];
 
 
-    // @HasMany(() => Experience, { onDelete: 'CASCADE' })
-    // experience!: Experience[];
-
-
-
-    // @HasMany(() => Certification, { onDelete: 'CASCADE' })
-    // certification!: Certification[];
+    @HasMany(() => Experience, { onDelete: 'CASCADE' })
+    experience!: Experience[];
 
 
 
-    // @HasMany(() => Porfolio, { onDelete: 'CASCADE' })
-    // porfolio!: Porfolio[];
+    @HasMany(() => Certification, { onDelete: 'CASCADE' })
+    certification!: Certification[];
+
+
+
+    @HasMany(() => Portfolio, { onDelete: 'CASCADE' })
+    portfolio!: Portfolio[];
 
     // @HasMany(() => Dispute, { onDelete: 'CASCADE' })
     // dispute!: Dispute[];
