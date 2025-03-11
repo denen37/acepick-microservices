@@ -1,4 +1,4 @@
-import { QueryInterface } from 'sequelize';
+import { QueryInterface, Sequelize } from 'sequelize';
 
 const userIds = [
     "0a1a5aad-6cfc-4cc7-b7c7-2ef40c314e2c",
@@ -17,10 +17,15 @@ module.exports = {
     up: async (queryInterface: QueryInterface) => {
         return queryInterface.bulkInsert('lanlog', userIds.map(userId => ({
             address: `Address for ${userId}`,
-            lantitude: Math.floor(Math.random() * 90),
-            longitude: Math.floor(Math.random() * 180),
-            coordinates: { type: 'Point', coordinates: [Math.random() * 180 - 90, Math.random() * 360 - 180] },
-            userId
+            latitude: Math.random() * 90,  // Use floating point numbers
+            longitude: Math.random() * 180, // Use floating point numbers
+            coordinates: Sequelize.fn(
+                'ST_GeomFromText',
+                `POINT(${Math.random() * 180 - 90} ${Math.random() * 360 - 180})`
+            ),
+            userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         })));
     },
 

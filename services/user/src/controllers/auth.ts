@@ -1389,15 +1389,15 @@ export const postlocationData = async (req: Request, res: Response) => {
         });
         if (getlocation) {
             const location = await getlocation.update({
-                lantitude: lan ?? getlocation.lantitude, longitude: log ?? getlocation.longitude,
+                latitude: lan ?? getlocation.latitude, longitude: log ?? getlocation.longitude,
                 userId: id, address: address ?? getlocation.address,
-                coordinates: { type: 'Point', coordinates: [lan ?? getlocation.lantitude, log ?? getlocation.longitude] },
+                coordinates: { type: 'Point', coordinates: [lan ?? getlocation.latitude, log ?? getlocation.longitude] },
             })
             if (location) return successResponse(res, "Updated Successfully", location);
             return errorResponse(res, "Failed updating Location");
         } else {
             const insertData = {
-                lantitude: lan, longitude: log, userId: id, address,
+                latitude: lan, longitude: log, userId: id, address,
                 coordinates: { type: 'Point', coordinates: [lan, log] },
             }
             const location = await LanLog.create(insertData);

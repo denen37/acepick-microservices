@@ -27,6 +27,8 @@ module.exports = {
             pin: Math.random().toString().slice(2, 6), // Generate a 4-digit random pin
             type: getRandomElement([WalletType.CLIENT, WalletType.PROFESSIONAL]),
             userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         })));
     },
 

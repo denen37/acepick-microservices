@@ -25,6 +25,8 @@ module.exports = {
             date: new Date().toISOString().split('T')[0],
             file: JSON.stringify({ url: `https://example.com/file${getRandomInt(1, 100)}.pdf` }),
             userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         })));
     },
 

@@ -29,6 +29,8 @@ module.exports = {
             noOfEmployees: getRandomInt(5, 500),
             userId,
             profileId: getRandomInt(1, 5),
+            createdAt: new Date(),
+            updatedAt: new Date(),
         })));
     },
 

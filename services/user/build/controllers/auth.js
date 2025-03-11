@@ -1124,9 +1124,9 @@ const postlocationData = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
         if (getlocation) {
             const location = yield getlocation.update({
-                lantitude: lan !== null && lan !== void 0 ? lan : getlocation.lantitude, longitude: log !== null && log !== void 0 ? log : getlocation.longitude,
+                latitude: lan !== null && lan !== void 0 ? lan : getlocation.latitude, longitude: log !== null && log !== void 0 ? log : getlocation.longitude,
                 userId: id, address: address !== null && address !== void 0 ? address : getlocation.address,
-                coordinates: { type: 'Point', coordinates: [lan !== null && lan !== void 0 ? lan : getlocation.lantitude, log !== null && log !== void 0 ? log : getlocation.longitude] },
+                coordinates: { type: 'Point', coordinates: [lan !== null && lan !== void 0 ? lan : getlocation.latitude, log !== null && log !== void 0 ? log : getlocation.longitude] },
             });
             if (location)
                 return (0, utility_1.successResponse)(res, "Updated Successfully", location);
@@ -1134,7 +1134,7 @@ const postlocationData = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         else {
             const insertData = {
-                lantitude: lan, longitude: log, userId: id, address,
+                latitude: lan, longitude: log, userId: id, address,
                 coordinates: { type: 'Point', coordinates: [lan, log] },
             };
             const location = yield LanLog_1.LanLog.create(insertData);

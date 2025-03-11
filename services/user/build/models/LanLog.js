@@ -22,12 +22,12 @@ __decorate([
 ], LanLog.prototype, "address", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.FLOAT),
     __metadata("design:type", Number)
-], LanLog.prototype, "lantitude", void 0);
+], LanLog.prototype, "latitude", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.FLOAT),
     __metadata("design:type", Number)
 ], LanLog.prototype, "longitude", void 0);
 __decorate([

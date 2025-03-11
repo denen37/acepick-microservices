@@ -10,12 +10,12 @@ export class LanLog extends Model {
     address!: string;
 
     @AllowNull(true)
-    @Column(DataType.INTEGER)
-    lantitude!: number
+    @Column(DataType.FLOAT)
+    latitude!: number
 
 
     @AllowNull(true)
-    @Column(DataType.INTEGER)
+    @Column(DataType.FLOAT)
     longitude!: number
 
 
