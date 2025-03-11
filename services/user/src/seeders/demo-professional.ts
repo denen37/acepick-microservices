@@ -46,6 +46,8 @@ module.exports = {
             professionId: generateRandomNumber(),
             sectorId: generateRandomNumber(),
             corperateId: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         })));
     },
 
