@@ -1,8 +1,16 @@
 import express, { Request, Response } from 'express';
 const routes = express.Router();
-import { TestEvent, getProfessions } from '../controllers/job';
+import { testApi, getProfessions, getSectors, getSectorsById, getProfessionById } from '../controllers/job';
+import { getProfByIdList, getProfIds } from '../controllers/services';
 
-routes.get('/test', TestEvent)
-routes.get('/get-all-profs-by-sector', getProfessions)
+routes.get('/test', testApi)
+
+routes.get('/sectors', getSectors)
+routes.get('/sectors/:id', getSectorsById)
+
+routes.get('/profs', getProfessions)
+routes.get('/profs/:id', getProfessionById)
+routes.get('/search_profs', getProfIds)
+routes.post('/get_profs', getProfByIdList)
 
 export default routes;

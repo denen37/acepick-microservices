@@ -8,12 +8,14 @@ import { randomUUID } from "crypto";
 
 
 export const getProfessions = async (req: Request, res: Response) => {
-    let { sector_id } = req.params
+    let { sectorid } = req.query
 
     let professions: any[] = []
 
+    let whereCondition = sectorid ? { sectorId: sectorid } : {}
+
     try {
-        professions = await Profession.findAll({ where: { sectorId: sector_id } })
+        professions = await Profession.findAll({ where: whereCondition })
     } catch (error) {
         return errorResponse(res, "error", error)
     }
@@ -22,34 +24,42 @@ export const getProfessions = async (req: Request, res: Response) => {
 }
 
 
-export const getSectors = async (req: Request, res: Response) => {
-    let { metadata } = req.query
 
-    let sectors: Sector[] = []
-    let jobs: number;
-    let professionals: number
+export const getProfessionById = async (req: Request, res: Response) => {
+    let { id } = req.params
 
     try {
-        sectors = await Sector.findAll()
+        let professions = await Profession.findOne({ where: { id } })
 
-        // if (metadata) {
-        //     for (let i = 0; i < sectors.length; i++) {
-        //         jobs = await Job.count({ where: { sectorId: sectors[i].id } })
-
-        //         // professionals = await Professional.count({ where: { sectorId: sectors[i].id } })
-
-        //         await PublishMessage("get_professionals", {sectorId: sectors[i].id})
-
-        //         sectors[i].dataValues.jobs = jobs
-
-        //         sectors[i].dataValues.professionals = professionals
-        //     }
-        // }
+        return successResponse(res, "success", professions)
     } catch (error) {
         return errorResponse(res, "error", error)
     }
+}
 
-    return successResponse(res, "success", sectors)
+
+export const getSectors = async (req: Request, res: Response) => {
+    let { metadata } = req.query
+
+    try {
+        let sectors = await Sector.findAll()
+
+        return successResponse(res, "success", sectors)
+    } catch (error) {
+        return errorResponse(res, "error", error)
+    }
+}
+
+export const getSectorsById = async (req: Request, res: Response) => {
+    let { id } = req.params
+
+    try {
+        let sector = await Sector.findOne({ where: { id: id } })
+
+        return successResponse(res, "success", sector)
+    } catch (error) {
+        return errorResponse(res, "error", error)
+    }
 }
 
 // export const getProfessionalById = async (req: Request, res: Response) => {
@@ -64,13 +74,8 @@ export const getSectors = async (req: Request, res: Response) => {
 //     }
 // }
 
-export const TestEvent = async (req: Request, res: Response) => {
-    // await PublishMessage('test2', { id: "123", title: "Web Development", description: "Build a website" },
-    //     { replyTo: "test_reply", correlationId: randomUUID() },
-    //     (msg) => {
-    //         console.log(msg.content.toString())
-    //     })
-    return successResponse(res, "success", "message sent")
+export const testApi = async (req: Request, res: Response) => {
+    return successResponse(res, "success", "Your Api is working!")
 }
 
 // export const get_professions = async (req: Request, res: Response) => {

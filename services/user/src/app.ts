@@ -21,7 +21,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 
-// app.all('*', isAuthorized);
+app.all('*', isAuthorized);
 app.use("/api", index);
 app.use("/api/auth/", auth);
 app.use('/api/profiles', profiles)

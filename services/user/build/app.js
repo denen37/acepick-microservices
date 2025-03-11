@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const db_1 = __importDefault(require("./config/db"));
 const configSetup_1 = __importDefault(require("./config/configSetup"));
 const cors_1 = __importDefault(require("cors"));
+const authorize_1 = require("./middlewares/authorize");
 const index_1 = __importDefault(require("./routes/index"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const profiles_1 = __importDefault(require("./routes/profiles"));
@@ -18,7 +19,7 @@ app.use((0, cors_1.default)({ origin: true }));
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'Hello, world! This is the user service' });
 });
-// app.all('*', isAuthorized);
+app.all('*', authorize_1.isAuthorized);
 app.use("/api", index_1.default);
 app.use("/api/auth/", auth_1.default);
 app.use('/api/profiles', profiles_1.default);

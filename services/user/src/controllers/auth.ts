@@ -31,6 +31,8 @@ import { Redis } from "../services/redis";
 // import { ProfessionalSector } from "../models/ProfessionalSector";
 import { Op } from "sequelize";
 import { sendExpoNotification } from "../services/expo";
+import { Professional } from "../models/Professional";
+import axios from "axios";
 
 
 // instantiate your stream client using the API key and secret
@@ -86,11 +88,13 @@ export const sendOtp = async (req: Request, res: Response) => {
     if (type == VerificationType.BOTH) {
         await Verify.create({
             serviceId,
-            code: codeSms
+            code: codeSms,
+            client: phone
         })
         await Verify.create({
             serviceId,
-            code: codeEmail
+            code: codeEmail,
+            client: email
         })
         const smsResult = await sendSMS(phone, codeSms.toString());
         const emailResult = await sendEmailResend(email, "Email Verification",
@@ -108,7 +112,8 @@ export const sendOtp = async (req: Request, res: Response) => {
     } else if (type == VerificationType.SMS) {
         await Verify.create({
             serviceId,
-            code: codeSms
+            code: codeSms,
+            client: phone
         })
         const smsResult = await sendSMS(phone, codeSms.toString());
         if (smsResult.status) return successResponse(res, "Successful", { ...smsResult, serviceId })
@@ -116,7 +121,8 @@ export const sendOtp = async (req: Request, res: Response) => {
     } else if (type == VerificationType.EMAIL) {
         await Verify.create({
             serviceId,
-            code: codeEmail
+            code: codeEmail,
+            client: email
         })
         const emailResult = await sendEmailResend(email, "Email Verification",
             `Dear User,<br><br>
@@ -354,13 +360,9 @@ export const passwordChange = async (req: Request, res: Response) => {
     const user = await User.findOne({ where: { id } })
     if (!user) return errorResponse(res, "Failed", { status: false, message: "User does not exist" })
 
-    // const match = await compare(password, user.password)
-    // if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Password" })
-
     hash(password, saltRounds, async function (err, hashedPassword) {
         await user.update({ password: hashedPassword })
-        let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
-        return successResponse(res, "Successful", { status: true, message: { ...user.dataValues, token } })
+        return successResponse(res, "Password changed successfully")
     })
 }
 
@@ -519,44 +521,90 @@ export const deleteUsers = async (req: Request, res: Response) => {
 
 
 
+export const upload_avatar = async (req: Request, res: Response) => {
+    let filePath = req.file?.path;
+
+    if (!filePath) {
+        return successResponseFalse(res, "No file uploaded")
+    }
+
+    return successResponse(res, "Successful", { filePath })
+}
+
 
 export const registerStepTwo = async (req: Request, res: Response) => {
-    let { fullName, lga, state, bvn, address, type } = req.body;
-    let avatar = req.file?.path;
+    let { fullName, lga, state, address, type, avatar } = req.body;
+
     let { id } = req.user;
-    console.log('id', id)
-    console.log(req.body)
+
     const user = await User.findOne({ where: { id } });
+
     const profile = await Profile.findOne({ where: { userId: id } });
+
     if (profile) return errorResponse(res, "Failed", { status: false, message: "Profile Already Exist" })
-    const profileCreate = await Profile.create({ fullName, lga, state, bvn, address, type, userId: id, avatar/*: convertHttpToHttps(avatar)*/ })
+
+    const profileCreate = await Profile.create({ fullName, lga, state, address, type, userId: id, avatar/*: convertHttpToHttps(avatar)*/ })
+
     const profileX = await Profile.findOne({ where: { userId: id } });
+
     await sendEmailResend(user!.email, "Welcome to Acepick", `Welcome on board ${profileX!.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
+
     await user?.update({ state: ProfileType.CLIENT ? UserState.VERIFIED : UserState.STEP_THREE })
+
     successResponse(res, "Successful", { status: true, message: profileCreate })
 }
 
 
 export const registerStepThree = async (req: Request, res: Response) => {
     let { intro, regNum, experience, sectorId, professionId, chargeFrom } = req.body;
-    let { id } = req.user;
-    const user = await User.findOne({ where: { id } });
-    // const professional = await Professional.findOne({ where: { userId: id } });
-    // if (professional) return errorResponse(res, "Failed", { status: false, message: "Professional Already Exist" })
 
-    // const profile = await Profile.findOne({ where: { userId: id } });
-    // const professionalCreate = await Professional.create({
-    //     profileId: profile?.id, intro, regNum, yearsOfExp: experience, chargeFrom,
-    //     file: { images: [] }, userId: id
-    // })
-    // const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
-    // await ProfessionalSector.create({
-    //     userId: id, sectorId, professionId, profileId: profile?.id,
-    //     yearsOfExp: experience, default: true, chargeFrom
-    // })
-    // await profile?.update({ type: ProfileType.PROFESSIONAL, corperate: false, switch: true })
-    // await user?.update({ state: UserState.VERIFIED })
-    // successResponse(res, "Successful", professionalCreate)
+
+    let sector: any;
+    let profession: any;
+
+    try {
+        let sectorResult = await axios.get(`http://${config.INTERNAL_HOST}:${config.JOBS_PORT}/api/jobs/sectors/${sectorId}`)
+
+        let profResult = await axios.get(`http://${config.INTERNAL_HOST}:${config.JOBS_PORT}/api/jobs/profs/${professionId}`)
+
+        sector = sectorResult.data.data
+
+        profession = profResult.data.data
+    } catch (error) {
+        errorResponse(res, "Failed", { message: "Error getting sector or profession", error })
+    }
+
+    if (!sector) {
+        return errorResponse(res, "Failed", { message: "Sector not found" })
+    }
+
+    if (!profession) {
+        return errorResponse(res, "Failed", { message: "Profession not found" })
+    }
+
+
+    let { id } = req.user;
+
+    const user = await User.findOne({ where: { id } });
+
+    const professional = await Professional.findOne({ where: { userId: id } });
+
+    if (professional) return errorResponse(res, "Failed", { status: false, message: "Professional Already Exist" })
+
+    const profile = await Profile.findOne({ where: { userId: id } });
+
+    const professionalCreate = await Professional.create({
+        profileId: profile?.id, intro, regNum, yearsOfExp: experience, chargeFrom,
+        file: { images: [] }, userId: id, sectorId, professionId
+    })
+
+    const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
+
+    await profile?.update({ type: ProfileType.PROFESSIONAL, corperate: false, switch: true })
+
+    await user?.update({ state: UserState.VERIFIED })
+
+    successResponse(res, "Successful", professionalCreate)
 }
 
 
@@ -629,11 +677,16 @@ export const changePassword = async (req: Request, res: Response) => {
     )
     if (!verify) return errorResponse(res, "Failed", { status: false, message: "Invalid Code" })
     hash(password, saltRounds, async function (err, hashedPassword) {
+
         const user = await User.findOne({ where: { email: verify.client } });
+
         user?.update({ password: hashedPassword })
-        let token = sign({ id: user!.id, email: user!.email, admin: true }, config.TOKEN_SECRET);
+
+        // let token = sign({ id: user!.id, email: user!.email }, config.TOKEN_SECRET);
+
         await verify.destroy()
-        return successResponse(res, "Successful", { ...user?.dataValues, token })
+
+        return successResponse(res, "Password Changed Successfully")
     });
 };
 
@@ -1412,6 +1465,20 @@ export const postlocationData = async (req: Request, res: Response) => {
     }
 }
 
+
+
+export const verifyMyBvn = async (req: Request, res: Response) => {
+    let { bvn } = req.body;
+    try {
+        let result = await verifyBvn(bvn);
+
+        let verifyStatus = result
+
+        return successResponse(res, "BVN verified successfully", verifyStatus);
+    } catch (error) {
+        return errorResponse(res, "BVN verification failed", error);
+    }
+}
 
 
 

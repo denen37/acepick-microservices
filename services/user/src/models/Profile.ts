@@ -139,7 +139,7 @@ export class Profile extends Model {
 
 
 
-    @AllowNull(false)
+    @AllowNull(true)
     @Column(DataType.STRING)
     bvn!: string;
 

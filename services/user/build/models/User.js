@@ -14,16 +14,16 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const uuid_1 = require("uuid");
 const Profile_1 = require("./Profile");
 // import { Profile } from './Profile';
-// import { Wallet } from './Wallet';
-// import { LanLog } from './LanLog';
+const Wallet_1 = require("./Wallet");
+const LanLog_1 = require("./LanLog");
 // import { Profession } from './Profession';
 // import { Jobs } from './Jobs';
 // import { Review } from './Review';
-// import { Education } from './Education';
-// import { Experience } from './Experience';
+const Education_1 = require("./Education");
+const Experience_1 = require("./Experience");
 // import { Certificate } from 'crypto';
-// import { Porfolio } from './Porfolio';
-// import { Certification } from './Certification';
+const Portfolio_1 = require("./Portfolio");
+const Certification_1 = require("./Certification");
 // import { Dispute } from './Dispute';
 // import Sequelize from 'sequelize/types/sequelize';
 // import { Professional } from './Professional';
@@ -93,9 +93,45 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "state", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => Wallet_1.Wallet),
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
+], User.prototype, "walletId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => Wallet_1.Wallet),
+    __metadata("design:type", Wallet_1.Wallet)
+], User.prototype, "wallet", void 0);
+__decorate([
     (0, sequelize_typescript_1.HasOne)(() => Profile_1.Profile),
     __metadata("design:type", Profile_1.Profile)
 ], User.prototype, "profile", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => LanLog_1.LanLog),
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
+], User.prototype, "locationId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => LanLog_1.LanLog),
+    __metadata("design:type", LanLog_1.LanLog)
+], User.prototype, "location", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Education_1.Education, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], User.prototype, "education", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Experience_1.Experience, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], User.prototype, "experience", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Certification_1.Certification, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], User.prototype, "certification", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Portfolio_1.Portfolio, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], User.prototype, "portfolio", void 0);
 exports.User = User = __decorate([
     (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'users' })
 ], User);

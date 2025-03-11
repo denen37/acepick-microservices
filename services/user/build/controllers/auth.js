@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyBvnDetail = exports.postlocationData = exports.changePassword = exports.updateFcmToken = exports.swithAccount = exports.corperateReg = exports.registerStepThree = exports.registerStepTwo = exports.deleteUsers = exports.login = exports.passwordChange = exports.register = exports.verifyOtp = exports.sendOtp = exports.updateProfile = void 0;
+exports.verifyBvnDetail = exports.verifyMyBvn = exports.postlocationData = exports.changePassword = exports.updateFcmToken = exports.swithAccount = exports.corperateReg = exports.registerStepThree = exports.registerStepTwo = exports.upload_avatar = exports.deleteUsers = exports.login = exports.passwordChange = exports.register = exports.verifyOtp = exports.sendOtp = exports.updateProfile = void 0;
 const utility_1 = require("../utils/utility");
 const configSetup_1 = __importDefault(require("../config/configSetup"));
 const Verify_1 = require("../models/Verify");
@@ -33,6 +33,8 @@ const string_similarity_1 = require("string-similarity");
 // yarn add stream-chat
 const stream_chat_1 = require("stream-chat");
 const redis_1 = require("../services/redis");
+const Professional_1 = require("../models/Professional");
+const axios_1 = __importDefault(require("axios"));
 // instantiate your stream client using the API key and secret
 // the secret is only used server side and gives you full access to the API
 const serverClient = stream_chat_1.StreamChat.getInstance('zzfb7h72xhc5', '5pfxakc5zasma3hw9awd2qsqgk2fxyr4a5qb3au4kkdt27d7ttnca7vnusfuztud');
@@ -73,11 +75,13 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (type == Verify_1.VerificationType.BOTH) {
         yield Verify_1.Verify.create({
             serviceId,
-            code: codeSms
+            code: codeSms,
+            client: phone
         });
         yield Verify_1.Verify.create({
             serviceId,
-            code: codeEmail
+            code: codeEmail,
+            client: email
         });
         const smsResult = yield (0, sms_1.sendSMS)(phone, codeSms.toString());
         const emailResult = yield (0, sms_1.sendEmailResend)(email, "Email Verification", `Dear User,<br><br>
@@ -94,7 +98,8 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     else if (type == Verify_1.VerificationType.SMS) {
         yield Verify_1.Verify.create({
             serviceId,
-            code: codeSms
+            code: codeSms,
+            client: phone
         });
         const smsResult = yield (0, sms_1.sendSMS)(phone, codeSms.toString());
         if (smsResult.status)
@@ -104,7 +109,8 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     else if (type == Verify_1.VerificationType.EMAIL) {
         yield Verify_1.Verify.create({
             serviceId,
-            code: codeEmail
+            code: codeEmail,
+            client: email
         });
         const emailResult = yield (0, sms_1.sendEmailResend)(email, "Email Verification", `Dear User,<br><br>
   
@@ -312,13 +318,10 @@ const passwordChange = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const user = yield User_1.User.findOne({ where: { id } });
     if (!user)
         return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "User does not exist" });
-    // const match = await compare(password, user.password)
-    // if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Password" })
     (0, bcryptjs_1.hash)(password, utility_1.saltRounds, function (err, hashedPassword) {
         return __awaiter(this, void 0, void 0, function* () {
             yield user.update({ password: hashedPassword });
-            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, configSetup_1.default.TOKEN_SECRET);
-            return (0, utility_1.successResponse)(res, "Successful", { status: true, message: Object.assign(Object.assign({}, user.dataValues), { token }) });
+            return (0, utility_1.successResponse)(res, "Password changed successfully");
         });
     });
 });
@@ -442,18 +445,23 @@ const deleteUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.deleteUsers = deleteUsers;
-const registerStepTwo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const upload_avatar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    let { fullName, lga, state, bvn, address, type } = req.body;
-    let avatar = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
+    let filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
+    if (!filePath) {
+        return (0, utility_1.successResponseFalse)(res, "No file uploaded");
+    }
+    return (0, utility_1.successResponse)(res, "Successful", { filePath });
+});
+exports.upload_avatar = upload_avatar;
+const registerStepTwo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { fullName, lga, state, address, type, avatar } = req.body;
     let { id } = req.user;
-    console.log('id', id);
-    console.log(req.body);
     const user = yield User_1.User.findOne({ where: { id } });
     const profile = yield Profile_1.Profile.findOne({ where: { userId: id } });
     if (profile)
         return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Profile Already Exist" });
-    const profileCreate = yield Profile_1.Profile.create({ fullName, lga, state, bvn, address, type, userId: id, avatar /*: convertHttpToHttps(avatar)*/ });
+    const profileCreate = yield Profile_1.Profile.create({ fullName, lga, state, address, type, userId: id, avatar /*: convertHttpToHttps(avatar)*/ });
     const profileX = yield Profile_1.Profile.findOne({ where: { userId: id } });
     yield (0, sms_1.sendEmailResend)(user.email, "Welcome to Acepick", `Welcome on board ${profileX.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
     yield (user === null || user === void 0 ? void 0 : user.update({ state: Profile_1.ProfileType.CLIENT ? User_1.UserState.VERIFIED : User_1.UserState.STEP_THREE }));
@@ -462,23 +470,37 @@ const registerStepTwo = (req, res) => __awaiter(void 0, void 0, void 0, function
 exports.registerStepTwo = registerStepTwo;
 const registerStepThree = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { intro, regNum, experience, sectorId, professionId, chargeFrom } = req.body;
+    let sector;
+    let profession;
+    try {
+        let sectorResult = yield axios_1.default.get(`http://${configSetup_1.default.INTERNAL_HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/sectors/${sectorId}`);
+        let profResult = yield axios_1.default.get(`http://${configSetup_1.default.INTERNAL_HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/profs/${professionId}`);
+        sector = sectorResult.data.data;
+        profession = profResult.data.data;
+    }
+    catch (error) {
+        (0, utility_1.errorResponse)(res, "Failed", { message: "Error getting sector or profession", error });
+    }
+    if (!sector) {
+        return (0, utility_1.errorResponse)(res, "Failed", { message: "Sector not found" });
+    }
+    if (!profession) {
+        return (0, utility_1.errorResponse)(res, "Failed", { message: "Profession not found" });
+    }
     let { id } = req.user;
     const user = yield User_1.User.findOne({ where: { id } });
-    // const professional = await Professional.findOne({ where: { userId: id } });
-    // if (professional) return errorResponse(res, "Failed", { status: false, message: "Professional Already Exist" })
-    // const profile = await Profile.findOne({ where: { userId: id } });
-    // const professionalCreate = await Professional.create({
-    //     profileId: profile?.id, intro, regNum, yearsOfExp: experience, chargeFrom,
-    //     file: { images: [] }, userId: id
-    // })
-    // const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
-    // await ProfessionalSector.create({
-    //     userId: id, sectorId, professionId, profileId: profile?.id,
-    //     yearsOfExp: experience, default: true, chargeFrom
-    // })
-    // await profile?.update({ type: ProfileType.PROFESSIONAL, corperate: false, switch: true })
-    // await user?.update({ state: UserState.VERIFIED })
-    // successResponse(res, "Successful", professionalCreate)
+    const professional = yield Professional_1.Professional.findOne({ where: { userId: id } });
+    if (professional)
+        return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Professional Already Exist" });
+    const profile = yield Profile_1.Profile.findOne({ where: { userId: id } });
+    const professionalCreate = yield Professional_1.Professional.create({
+        profileId: profile === null || profile === void 0 ? void 0 : profile.id, intro, regNum, yearsOfExp: experience, chargeFrom,
+        file: { images: [] }, userId: id, sectorId, professionId
+    });
+    const wallet = yield Wallet_1.Wallet.create({ userId: user === null || user === void 0 ? void 0 : user.id, type: Wallet_1.WalletType.PROFESSIONAL });
+    yield (profile === null || profile === void 0 ? void 0 : profile.update({ type: Profile_1.ProfileType.PROFESSIONAL, corperate: false, switch: true }));
+    yield (user === null || user === void 0 ? void 0 : user.update({ state: User_1.UserState.VERIFIED }));
+    (0, utility_1.successResponse)(res, "Successful", professionalCreate);
 });
 exports.registerStepThree = registerStepThree;
 const corperateReg = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -542,9 +564,9 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne({ where: { email: verify.client } });
             user === null || user === void 0 ? void 0 : user.update({ password: hashedPassword });
-            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, admin: true }, configSetup_1.default.TOKEN_SECRET);
+            // let token = sign({ id: user!.id, email: user!.email }, config.TOKEN_SECRET);
             yield verify.destroy();
-            return (0, utility_1.successResponse)(res, "Successful", Object.assign(Object.assign({}, user === null || user === void 0 ? void 0 : user.dataValues), { token }));
+            return (0, utility_1.successResponse)(res, "Password Changed Successfully");
         });
     });
 });
@@ -1150,6 +1172,18 @@ const postlocationData = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.postlocationData = postlocationData;
+const verifyMyBvn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { bvn } = req.body;
+    try {
+        let result = yield (0, bvn_1.verifyBvn)(bvn);
+        let verifyStatus = result;
+        return (0, utility_1.successResponse)(res, "BVN verified successfully", verifyStatus);
+    }
+    catch (error) {
+        return (0, utility_1.errorResponse)(res, "BVN verification failed", error);
+    }
+});
+exports.verifyMyBvn = verifyMyBvn;
 const verifyBvnDetail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const redis = new redis_1.Redis();
