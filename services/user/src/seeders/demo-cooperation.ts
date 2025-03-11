@@ -28,6 +28,7 @@ module.exports = {
             regNum: `REG-${getRandomInt(1000, 9999)}`,
             noOfEmployees: getRandomInt(5, 500),
             userId,
+            sectorId: getRandomInt(1, 10),
             profileId: getRandomInt(1, 5),
             createdAt: new Date(),
             updatedAt: new Date(),
