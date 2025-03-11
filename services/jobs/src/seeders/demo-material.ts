@@ -9,6 +9,8 @@ module.exports = {
             subTotal: Math.floor(Math.random() * 100) + 50,
             price: Math.floor(Math.random() * 20) + 10,
             jobId: (index % 10) + 1,
+            createdAt: new Date(),
+            updatedAt: new Date()
         })));
     },
 

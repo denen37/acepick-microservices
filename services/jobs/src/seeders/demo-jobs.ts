@@ -26,6 +26,8 @@ module.exports = {
             sectorId: (index % 10) + 1,
             seen: false,
             approved: false,
+            createdAt: new Date(),
+            updatedAt: new Date()
         })));
     },
 

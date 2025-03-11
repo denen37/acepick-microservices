@@ -23,6 +23,8 @@ module.exports = {
             jobId: index + 1,
             reporterId: userIds[index % userIds.length],
             partnerId: userIds[(index + 1) % userIds.length],
+            createdAt: new Date(),
+            updatedAt: new Date()
         })));
     },
 

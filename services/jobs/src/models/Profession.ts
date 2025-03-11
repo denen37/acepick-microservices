@@ -3,7 +3,7 @@ import { Sector } from './Sector';
 
 
 
-@Table({ timestamps: true, tableName: 'profession' })
+@Table({ timestamps: false, tableName: 'profession' })
 export class Profession extends Model {
     @AllowNull(false)
     @Column(DataType.STRING)
