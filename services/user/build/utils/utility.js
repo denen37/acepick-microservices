@@ -44,7 +44,7 @@ const successResponseFalse = (res, message = 'Operation successfull', data) => {
 };
 exports.successResponseFalse = successResponseFalse;
 const errorResponse = (res, message = 'An error occured', data) => {
-    return res.status(200).json({
+    return res.status(500).json({
         status: false,
         message,
         data,

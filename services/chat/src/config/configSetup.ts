@@ -13,8 +13,6 @@ type Config = {
     DB_DIALECT: string | undefined;
     PUBLIC_ROUTES: string[] | [];
     REDIS_INSTANCE_URL: string | undefined;
-    PAYSTACK_SECRET: string | undefined;
-    RABBITMQ_URL: string | undefined;
     AUTH_BASE_URL: string | undefined;
 };
 
@@ -29,32 +27,11 @@ const getConfig = (): Config => {
         DB_PORT: Number(process.env.DB_PORT),
         DB_DIALECT: process.env.DB_DIALECT,
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
-        PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
-        RABBITMQ_URL: process.env.RABBITMQ_URL,
         AUTH_BASE_URL: process.env.AUTH_BASE_URL,
         PUBLIC_ROUTES: [
             '/api',
             '/',
-            '/api/send-otp',
-            '/api/register',
-            '/api/verify-otp',
-            '/api/webhook',
-            '/api/change-password',
-            '/api/delete-users',
-            '/api/admin/send-otp',
-            '/api/login',
-            '/api/testN',
-            '/api/sector',
-            '/api/fileupload',
-            '/api/profession',
-            '/api/admin/send-invites',
-            '/api/admin/get-invite',
-            '/api/admin/reset-password',
 
-            '/api/admin/update-invite',
-            '/api/admin/check-email',
-            "/api/admin/register",
-            "/api/admin/login",
         ],
     };
 };

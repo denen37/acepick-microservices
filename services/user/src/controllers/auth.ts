@@ -33,6 +33,7 @@ import { Op } from "sequelize";
 import { sendExpoNotification } from "../services/expo";
 import { Professional } from "../models/Professional";
 import axios from "axios";
+import { verify } from "jsonwebtoken";
 
 
 // instantiate your stream client using the API key and secret
@@ -43,7 +44,23 @@ const serverClient = StreamChat.getInstance('zzfb7h72xhc5',
 
 // generate a token for the user with id 'john'
 
+export const authorize = async (req: Request, res: Response) => {
 
+    let { token }: { token: string } = req.body;
+
+    if (!token) return handleResponse(res, 401, false, `Access Denied / Unauthorized request`);
+
+    if (token.includes('Bearer')) token = token.split(' ')[1];
+
+    if (token === 'null' || !token) return handleResponse(res, 401, false, `Unauthorized request`);
+
+    let verified: any = verify(token, config.TOKEN_SECRET);
+
+    if (!verified) return handleResponse(res, 401, false, `Unauthorized request`);
+
+    return handleResponse(res, 200, true, `Authorized`, verified);
+
+}
 
 
 
@@ -374,11 +391,11 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await User.findOne({ where: { email } })
 
-    if (!user) return errorResponse(res, "Failed", { status: false, message: "User does not exist" })
+    if (!user) return handleResponse(res, 404, false, "User does not exist")
 
     const match = await compare(password, user.password)
 
-    if (!match) return errorResponse(res, "Failed", { status: false, message: "Invalid Credentials" })
+    if (!match) return handleResponse(res, 404, false, "Invalid Credentials")
 
     let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
 
@@ -689,54 +706,6 @@ export const changePassword = async (req: Request, res: Response) => {
         return successResponse(res, "Password Changed Successfully")
     });
 };
-
-
-
-
-
-// export const ProfAccountInfo = async (req: Request, res: Response) => {
-//     const { id } = req.user;
-//     const profile = await Professional.findOne(
-//         {
-//             where: { userId: id },
-//             attributes: {
-//                 exclude: []
-//             },
-//             include: [
-//                 {
-//                     model: User,
-//                     attributes: [
-//                         "email", "phone"], include: [{
-//                             model: Wallet,
-//                             where: {
-//                                 type: WalletType.PROFESSIONAL
-//                             }
-//                         }]
-//                 },
-//                 {
-//                     model: Cooperation,
-//                 },
-
-//                 {
-//                     model: Profile,
-//                     attributes: [
-//                         'createdAt', 'updatedAt', "fullName", "avatar", "lga", "state", "address", "bvn", "type"],
-//                     include: [{
-//                         model: ProfessionalSector, include: [
-//                             { model: Sector },
-//                             { model: Profession },
-//                         ]
-//                     },]
-//                 }
-//             ],
-
-//         }
-//     )
-//     if (!profile) return errorResponse(res, "Failed", { status: false, message: "Profile Does'nt exist" })
-//     return successResponse(res, "Successful", profile)
-// };
-
-
 
 
 

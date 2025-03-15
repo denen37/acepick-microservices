@@ -15,7 +15,6 @@ routes.get('/switch', auth_1.swithAccount);
 // routes.get('/profile/:id', accountSingleInfo)
 routes.post('/update-profile', auth_1.updateProfile);
 // routes.post('/update-professional', updateProfessional);
-// routes.get('/professional/profile', ProfAccountInfo);
 // routes.post('/corperate', ProfAccountInfo);
 routes.post('/register', auth_1.register);
 routes.post('/upload_avatar', upload_1.uploads.single('avatar'), auth_1.upload_avatar);
@@ -30,6 +29,7 @@ routes.post('/update-fcm-token', auth_1.updateFcmToken);
 routes.post("/verify-bvn", auth_1.verifyBvnDetail);
 routes.post("/verify-bvn2", auth_1.verifyMyBvn);
 routes.get("/delete-users", auth_1.deleteUsers);
+routes.post('/verify-token', auth_1.authorize);
 // routes.get("/createCat", createCat)
 exports.default = routes;
 //# sourceMappingURL=auth.js.map

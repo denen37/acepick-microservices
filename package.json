@@ -9,7 +9,8 @@
   },
   "workspaces": [
     "services/user",
-    "services/jobs"
+    "services/jobs",
+    "services/chat"
   ],
   "author": "",
   "license": "ISC",

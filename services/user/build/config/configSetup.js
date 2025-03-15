@@ -66,6 +66,7 @@ const getConfig = () => {
             '/api/auth/send-otp',
             '/api/auth/register',
             '/api/auth/verify-otp',
+            '/api/auth/verify-token',
             '/api/webhook',
             '/api/auth/change-password-forgot',
             '/api/delete-users',

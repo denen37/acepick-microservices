@@ -28,7 +28,7 @@ const isAuthorized = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     let token = req.headers.authorization;
     if (!token)
         return (0, utility_1.handleResponse)(res, 401, false, `Access Denied / Unauthorized request`);
-    token = token.split(' ')[1]; // Remove Bearer from string 
+    token = token.split(' ')[1];
     if (token === 'null' || !token)
         return (0, utility_1.handleResponse)(res, 401, false, `Unauthorized request`);
     let verified = (0, jsonwebtoken_1.verify)(token, configSetup_1.default.TOKEN_SECRET);

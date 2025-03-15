@@ -1,10 +1,9 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import db from './config/db'
+import db from './config/db';
 import config from './config/configSetup';
-import jobRoutes from './routes/jobs'
-import serviceRoutes from './routes/services'
-import { suscribe } from './events/suscribe';
+import jobRoutes from './routes/jobs';
+import isAuthorized from './middlewares/authorize'
 
 
 const app = express();
@@ -18,6 +17,7 @@ app.get('/jobs/', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Hello, world! This is the jobs service' });
 });
 
+app.all('*', isAuthorized);
 app.use('/api/jobs', jobRoutes);
 
 db.sync({ alter: true }).then(() => {

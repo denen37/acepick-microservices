@@ -5,6 +5,7 @@ import { User } from "../models/User";
 import { errorResponse, successResponse } from "../utils/utility";
 import { Professional } from "../models/Professional";
 // import { PublishMessage } from "../events/handler";
+import { Wallet, WalletType } from "../models/Wallet";
 import { randomUUID } from "crypto";
 import axios from "axios";
 import config from '../config/configSetup'
@@ -102,3 +103,45 @@ export const getProfessionals = async (req: Request, res: Response) => {
         return errorResponse(res, 'error', err);
     }
 }
+
+
+export const ProfAccountInfo = async (req: Request, res: Response) => {
+    const { id } = req.user;
+    const profile = await Professional.findOne(
+        {
+            where: { userId: id },
+            attributes: {
+                exclude: []
+            },
+            include: [
+                {
+                    model: User,
+                    attributes: [
+                        "email", "phone"],
+                    include: [{
+                        model: Wallet,
+                        where: {
+                            type: WalletType.PROFESSIONAL
+                        }
+                    },
+
+                    {
+                        model: Profile,
+                        attributes: [
+                            'createdAt', 'updatedAt', "fullName", "avatar", "lga", "state", "address", "bvn", "type"],
+
+                    }
+                    ]
+                },
+                {
+                    model: Cooperation,
+                },
+
+
+            ],
+
+        }
+    )
+    if (!profile) return errorResponse(res, "Failed", { status: false, message: "Profile Does'nt exist" })
+    return successResponse(res, "Successful", profile)
+};

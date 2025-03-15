@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyBvnDetail = exports.verifyMyBvn = exports.postlocationData = exports.changePassword = exports.updateFcmToken = exports.swithAccount = exports.corperateReg = exports.registerStepThree = exports.registerStepTwo = exports.upload_avatar = exports.deleteUsers = exports.login = exports.passwordChange = exports.register = exports.verifyOtp = exports.sendOtp = exports.updateProfile = void 0;
+exports.verifyBvnDetail = exports.verifyMyBvn = exports.postlocationData = exports.changePassword = exports.updateFcmToken = exports.swithAccount = exports.corperateReg = exports.registerStepThree = exports.registerStepTwo = exports.upload_avatar = exports.deleteUsers = exports.login = exports.passwordChange = exports.register = exports.verifyOtp = exports.sendOtp = exports.updateProfile = exports.authorize = void 0;
 const utility_1 = require("../utils/utility");
 const configSetup_1 = __importDefault(require("../config/configSetup"));
 const Verify_1 = require("../models/Verify");
@@ -35,11 +35,26 @@ const stream_chat_1 = require("stream-chat");
 const redis_1 = require("../services/redis");
 const Professional_1 = require("../models/Professional");
 const axios_1 = __importDefault(require("axios"));
+const jsonwebtoken_2 = require("jsonwebtoken");
 // instantiate your stream client using the API key and secret
 // the secret is only used server side and gives you full access to the API
 const serverClient = stream_chat_1.StreamChat.getInstance('zzfb7h72xhc5', '5pfxakc5zasma3hw9awd2qsqgk2fxyr4a5qb3au4kkdt27d7ttnca7vnusfuztud');
 // you can still use new StreamChat('api_key', 'api_secret');
 // generate a token for the user with id 'john'
+const authorize = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let { token } = req.body;
+    if (!token)
+        return (0, utility_1.handleResponse)(res, 401, false, `Access Denied / Unauthorized request`);
+    if (token.includes('Bearer'))
+        token = token.split(' ')[1];
+    if (token === 'null' || !token)
+        return (0, utility_1.handleResponse)(res, 401, false, `Unauthorized request`);
+    let verified = (0, jsonwebtoken_2.verify)(token, configSetup_1.default.TOKEN_SECRET);
+    if (!verified)
+        return (0, utility_1.handleResponse)(res, 401, false, `Unauthorized request`);
+    return (0, utility_1.handleResponse)(res, 200, true, `Authorized`, verified);
+});
+exports.authorize = authorize;
 const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { postalCode, lga, state, address, avatar } = req.body;
     let { id } = req.user;
@@ -330,10 +345,10 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { email, password, type, fcmToken } = req.body;
     const user = yield User_1.User.findOne({ where: { email } });
     if (!user)
-        return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "User does not exist" });
+        return (0, utility_1.handleResponse)(res, 404, false, "User does not exist");
     const match = yield (0, bcryptjs_1.compare)(password, user.password);
     if (!match)
-        return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Invalid Credentials" });
+        return (0, utility_1.handleResponse)(res, 404, false, "Invalid Credentials");
     let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, configSetup_1.default.TOKEN_SECRET);
     const chatToken = serverClient.createToken(`${String(user.id)}`);
     const profile = yield Profile_1.Profile.findOne({ where: { userId: user.id } });
@@ -571,45 +586,6 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     });
 });
 exports.changePassword = changePassword;
-// export const ProfAccountInfo = async (req: Request, res: Response) => {
-//     const { id } = req.user;
-//     const profile = await Professional.findOne(
-//         {
-//             where: { userId: id },
-//             attributes: {
-//                 exclude: []
-//             },
-//             include: [
-//                 {
-//                     model: User,
-//                     attributes: [
-//                         "email", "phone"], include: [{
-//                             model: Wallet,
-//                             where: {
-//                                 type: WalletType.PROFESSIONAL
-//                             }
-//                         }]
-//                 },
-//                 {
-//                     model: Cooperation,
-//                 },
-//                 {
-//                     model: Profile,
-//                     attributes: [
-//                         'createdAt', 'updatedAt', "fullName", "avatar", "lga", "state", "address", "bvn", "type"],
-//                     include: [{
-//                         model: ProfessionalSector, include: [
-//                             { model: Sector },
-//                             { model: Profession },
-//                         ]
-//                     },]
-//                 }
-//             ],
-//         }
-//     )
-//     if (!profile) return errorResponse(res, "Failed", { status: false, message: "Profile Does'nt exist" })
-//     return successResponse(res, "Successful", profile)
-// };
 // export const accountInfo = async (req: Request, res: Response) => {
 //     const { id } = req.user;
 //     const profileX = await Profile.findOne(
