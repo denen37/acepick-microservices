@@ -1,10 +1,9 @@
+
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey, PrimaryKey, AutoIncrement } from 'sequelize-typescript';
 import { Message } from './Message';
 
-
-
-@Table({ timestamps: true, tableName: 'chats' })
-export class Chat extends Model {
+@Table({ timestamps: true, tableName: 'chat_rooms' })
+export class ChatRoom extends Model {
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.BIGINT)
@@ -13,16 +12,17 @@ export class Chat extends Model {
 
 
     @AllowNull(false)
-    @Column(DataType.BIGINT)
-    profId!: number;
+    @Column(DataType.STRING)
+    name!: string;
 
 
 
     @AllowNull(false)
-    @Column(DataType.BIGINT)
-    clientId!: number;
+    @Column(DataType.STRING)
+    members!: string
 
 
-    @HasMany(() => Message, { onDelete: 'CASCADE' })
+
+    @HasMany(() => Message, { foreignKey: 'chatroomId' })
     messages!: Message[]
 }

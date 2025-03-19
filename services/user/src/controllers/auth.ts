@@ -3,7 +3,7 @@ import config from "../config/configSetup"
 import { Request, Response } from 'express';
 import { VerificationType, Verify } from "../models/Verify";
 import { sendEmailResend, sendSMS } from "../services/sms";
-import { UserState, UserStatus, User } from "../models/User";
+import { UserState, UserStatus, User, UserRole } from "../models/User";
 import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { Profile, ProfileType } from "../models/Profile";
@@ -296,8 +296,8 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
 
 
-export const register = async (req: Request, res: Response) => {
-    const { email, phone, password } = req.body;
+export const register = async (req: Request, res: Response): Promise<any> => {
+    const { email, phone, password, role } = req.body;
     hash(password, saltRounds, async function (err, hashedPassword) {
         const userEmail = await User.findOne({ where: { email } })
         const userPhone = await User.findOne({ where: { phone } })
@@ -313,7 +313,7 @@ export const register = async (req: Request, res: Response) => {
         }
 
         const user = await User.create({
-            email, phone, password: hashedPassword
+            email, phone, password: hashedPassword, role
         })
 
         //TODO use a request to payment create the wallet
@@ -344,7 +344,7 @@ export const register = async (req: Request, res: Response) => {
             return errorResponse(res, "An Error Occurred", error)
         }
 
-        let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
+        let token = sign({ id: user.id, email: user.email, role: user.role }, config.TOKEN_SECRET);
         const chatToken = serverClient.createToken(`${String(user.id)}`);
         const profile = await Profile.findOne({ where: { userId: user.id } })
 
@@ -397,7 +397,7 @@ export const login = async (req: Request, res: Response) => {
 
     if (!match) return handleResponse(res, 404, false, "Invalid Credentials")
 
-    let token = sign({ id: user.id, email: user.email }, config.TOKEN_SECRET);
+    let token = sign({ id: user.id, email: user.email, role: user.role }, config.TOKEN_SECRET);
 
     const chatToken = serverClient.createToken(`${String(user.id)}`);
 

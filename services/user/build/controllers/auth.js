@@ -262,7 +262,7 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.verifyOtp = verifyOtp;
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, phone, password } = req.body;
+    const { email, phone, password, role } = req.body;
     (0, bcryptjs_1.hash)(password, utility_1.saltRounds, function (err, hashedPassword) {
         return __awaiter(this, void 0, void 0, function* () {
             const userEmail = yield User_1.User.findOne({ where: { email } });
@@ -279,7 +279,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 yield (userEmail === null || userEmail === void 0 ? void 0 : userEmail.destroy());
             }
             const user = yield User_1.User.create({
-                email, phone, password: hashedPassword
+                email, phone, password: hashedPassword, role
             });
             //TODO use a request to payment create the wallet
             const wallet = yield Wallet_1.Wallet.create({ userId: user.id });
@@ -306,7 +306,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             catch (error) {
                 return (0, utility_1.errorResponse)(res, "An Error Occurred", error);
             }
-            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, configSetup_1.default.TOKEN_SECRET);
+            let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, role: user.role }, configSetup_1.default.TOKEN_SECRET);
             const chatToken = serverClient.createToken(`${String(user.id)}`);
             const profile = yield Profile_1.Profile.findOne({ where: { userId: user.id } });
             try {
@@ -349,7 +349,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const match = yield (0, bcryptjs_1.compare)(password, user.password);
     if (!match)
         return (0, utility_1.handleResponse)(res, 404, false, "Invalid Credentials");
-    let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, configSetup_1.default.TOKEN_SECRET);
+    let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, role: user.role }, configSetup_1.default.TOKEN_SECRET);
     const chatToken = serverClient.createToken(`${String(user.id)}`);
     const profile = yield Profile_1.Profile.findOne({ where: { userId: user.id } });
     yield (profile === null || profile === void 0 ? void 0 : profile.update({ fcmToken }));

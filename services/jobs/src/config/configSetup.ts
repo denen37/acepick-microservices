@@ -33,28 +33,8 @@ const getConfig = (): Config => {
         RABBITMQ_URL: process.env.RABBITMQ_URL,
         AUTH_BASE_URL: process.env.AUTH_BASE_URL,
         PUBLIC_ROUTES: [
-            '/api',
-            '/',
-            '/api/send-otp',
-            '/api/register',
-            '/api/verify-otp',
-            '/api/webhook',
-            '/api/change-password',
-            '/api/delete-users',
-            '/api/admin/send-otp',
-            '/api/login',
-            '/api/testN',
-            '/api/sector',
-            '/api/fileupload',
-            '/api/profession',
-            '/api/admin/send-invites',
-            '/api/admin/get-invite',
-            '/api/admin/reset-password',
-
-            '/api/admin/update-invite',
-            '/api/admin/check-email',
-            "/api/admin/register",
-            "/api/admin/login",
+            "/api/jobs/search_profs",
+            "/api/jobs/get_profs"
         ],
     };
 };

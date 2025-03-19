@@ -1,8 +1,8 @@
 import { Sequelize } from "sequelize-typescript";
 import config from "../config/configSetup";
 import path from "path";
-import { Chat } from "../models/Chat";
 import { Message } from "../models/Message";
+import { ChatRoom } from "../models/ChatRoom";
 
 const env = process.env.NODE_ENV || "development";
 
@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
             ssl: false,
         },
         logging: false,
-        models: [Chat, Message]
+        models: [Message, ChatRoom]
     }
 );
 

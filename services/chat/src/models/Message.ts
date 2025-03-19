@@ -1,12 +1,7 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey, PrimaryKey, AutoIncrement } from 'sequelize-typescript';
-import { Chat } from './Chat';
+import { ChatRoom } from './ChatRoom';
 
-export enum MessageFrom {
-    PROFESSIONAL = 'professional',
-    CLIENT = 'client'
-}
-
-@Table({ timestamps: true, tableName: 'messages' })
+@Table({ timestamps: false, tableName: 'messages' })
 export class Message extends Model {
     @PrimaryKey
     @AutoIncrement
@@ -16,14 +11,14 @@ export class Message extends Model {
 
 
     @AllowNull(false)
-    @Column(DataType.ENUM(...Object.values(MessageFrom)))
+    @Column(DataType.UUID)
     from!: string
 
 
 
     @AllowNull(false)
     @Column(DataType.TEXT)
-    message!: string
+    text!: string
 
 
 
@@ -33,13 +28,20 @@ export class Message extends Model {
     isDeleted!: boolean
 
 
+
     @AllowNull(false)
-    @ForeignKey(() => Chat)
+    @Column(DataType.DATE)
+    timestamp!: Date
+
+
+
+    @AllowNull(false)
+    @ForeignKey(() => ChatRoom)
     @Column(DataType.BIGINT)
-    chatId!: number;
+    chatroomId!: number
 
 
 
-    @BelongsTo(() => Chat, { onDelete: 'CASCADE' })
-    chat!: Chat
+    @BelongsTo(() => ChatRoom, 'chatroomId')
+    chatroom!: ChatRoom
 }

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = exports.UserState = exports.UserStatus = void 0;
+exports.User = exports.UserRole = exports.UserState = exports.UserStatus = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const uuid_1 = require("uuid");
 const Profile_1 = require("./Profile");
@@ -47,6 +47,11 @@ var UserState;
     UserState["STEP_THREE"] = "STEP_THREE";
     UserState["VERIFIED"] = "VERIFIED";
 })(UserState || (exports.UserState = UserState = {}));
+var UserRole;
+(function (UserRole) {
+    UserRole["PROFESSIONAL"] = "professional";
+    UserRole["CLIENT"] = "client";
+})(UserRole || (exports.UserRole = UserRole = {}));
 let User = class User extends sequelize_typescript_1.Model {
 };
 exports.User = User;
@@ -87,6 +92,11 @@ __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.SUSPENDED)),
     __metadata("design:type", String)
 ], User.prototype, "status", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)(UserRole.CLIENT),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM(UserRole.PROFESSIONAL, UserRole.CLIENT)),
+    __metadata("design:type", String)
+], User.prototype, "role", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(UserState.STEP_TWO),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM(UserState.STEP_ONE, UserState.STEP_TWO, UserState.STEP_THREE, UserState.VERIFIED)),

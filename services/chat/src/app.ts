@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import config from "./config/configSetup"
 import chatSocket from "./chats"
+import db from "./config/db";
 // const URL = `http://localhost:${PORT}`
 
 const app = express();
@@ -24,8 +25,10 @@ app.get("/", (req, res) => {
 chatSocket(server)
 
 const PORT = config.PORT || 5000;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
 
-
+db.sync({ alter: true }).then(() => {
+    server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+})
+    .catch((err: any) => console.error('Error connecting to the database', err));

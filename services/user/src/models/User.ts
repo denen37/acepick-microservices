@@ -41,6 +41,11 @@ export enum UserState {
     VERIFIED = 'VERIFIED',
 }
 
+export enum UserRole {
+    PROFESSIONAL = 'professional',
+    CLIENT = 'client',
+}
+
 
 
 @Table({ timestamps: true, tableName: 'users' })
@@ -82,6 +87,11 @@ export class User extends Model {
     @Default(UserStatus.ACTIVE)
     @Column(DataType.ENUM(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.SUSPENDED))
     status!: UserStatus;
+
+
+    @Default(UserRole.CLIENT)
+    @Column(DataType.ENUM(UserRole.PROFESSIONAL, UserRole.CLIENT))
+    role!: UserRole;
 
 
 

@@ -10,8 +10,9 @@ routes.get('/sectors/:id', getSectorsById)
 
 routes.get('/profs', getProfessions)
 routes.get('/profs/:id', getProfessionById)
+routes.get('/myjobs', getJobs) //query = {status, }
+
 routes.get('/search_profs', getProfIds)
 routes.post('/get_profs', getProfByIdList)
-routes.get('/myjobs', getJobs) //query = {status, }
 
 export default routes;
