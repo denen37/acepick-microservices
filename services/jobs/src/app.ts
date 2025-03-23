@@ -21,7 +21,10 @@ app.all('*', isAuthorized);
 app.use('/api/jobs', jobRoutes);
 
 db.sync({ alter: true }).then(() => {
-    app.listen(config.PORT, () => console.log(`Server is running on http://localhost:${config.PORT}`));
+    app.listen(
+        config.PORT || 5001,
+        config.HOST || '0.0.0.0',
+        () => console.log(`Server is running on http://${config.HOST}:${config.PORT}`));
 })
     .catch((err: any) => console.error('Error connecting to the database', err));
 

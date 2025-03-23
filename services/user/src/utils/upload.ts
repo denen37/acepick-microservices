@@ -1,7 +1,8 @@
 
 // import { NextFunction, Request, Response } from 'express';
 // import config from '../config/configSetup';
-const cloudinary = require('cloudinary').v2
+import { v2 as cloudinary } from 'cloudinary';
+import config from "../config/configSetup";
 import multer from "multer";
 const fs = require('fs')
 const path = require('path')
@@ -10,9 +11,9 @@ const path = require('path')
 
 // cloudinary configuration
 cloudinary.config({
-  cloud_name: 'dqth56myg',
-  api_key: '774921177923962',
-  api_secret: 'dDUKTJBycDHC4gjOKZ9UAHw8SAM'
+  cloud_name: config.CLOUDINARY_NAME,
+  api_key: config.CLOUDINARY_API_KEY,
+  api_secret: config.CLOUDINARY_API_SECRET
 });
 
 
@@ -30,7 +31,7 @@ const pathExistsOrCreate = (dirPath: string): string => {
 
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, pathExistsOrCreate('../public/images'))
+    cb(null, pathExistsOrCreate('../../public/uploads'))
   },
   filename: (req, file, cb) => {
     let filename = Date.now() + "--" + file.originalname;
@@ -49,6 +50,24 @@ export const uploads = multer({
 
 export const upload_cloud = async (path: string) => {
   const result = await cloudinary.uploader.upload(path, { resource_type: 'auto' })
-  console.log(result.secure_url)
-  return result.secure_url;
+  // console.log(result.secure_url)
+
+  const url = cloudinary.url(result.public_id, {
+    transformation: [
+      {
+        fetch_format: 'auto',
+        quality: 'auto'
+      }, {
+        crop: 'auto',
+        gravity: 'auto',
+        width: 600,
+        height: 600,
+      }
+    ]
+  })
+
+  console.log(url);
+
+  return url
 }
+

@@ -16,6 +16,8 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: true }));
 
+express.static(path.join(__dirname, 'public'));
+
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Hello, world! This is the user service' });
 });
@@ -30,7 +32,10 @@ app.use('/api/profiles', profiles)
 
 
 db.sync({ alter: true }).then(() => {
-    app.listen(config.PORT, () => console.log(`Server is running on http://localhost:${config.PORT}`));
+    app.listen(
+        config.PORT || 5000,
+        config.HOST || '0.0.0.0',
+        () => console.log(`Server is running on http://${config.HOST}:${config.PORT}`));
 })
     .catch(err => console.error('Error connecting to the database', err));
 

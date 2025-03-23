@@ -15,15 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.upload_cloud = exports.uploads = void 0;
 // import { NextFunction, Request, Response } from 'express';
 // import config from '../config/configSetup';
-const cloudinary = require('cloudinary').v2;
+const cloudinary_1 = require("cloudinary");
+const configSetup_1 = __importDefault(require("../config/configSetup"));
 const multer_1 = __importDefault(require("multer"));
 const fs = require('fs');
 const path = require('path');
 // cloudinary configuration
-cloudinary.config({
-    cloud_name: 'dqth56myg',
-    api_key: '774921177923962',
-    api_secret: 'dDUKTJBycDHC4gjOKZ9UAHw8SAM'
+cloudinary_1.v2.config({
+    cloud_name: configSetup_1.default.CLOUDINARY_NAME,
+    api_key: configSetup_1.default.CLOUDINARY_API_KEY,
+    api_secret: configSetup_1.default.CLOUDINARY_API_SECRET
 });
 const pathExistsOrCreate = (dirPath) => {
     let filepath = path.resolve(__dirname, dirPath);
@@ -46,9 +47,23 @@ exports.uploads = (0, multer_1.default)({
     storage: imageStorage,
 });
 const upload_cloud = (path) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield cloudinary.uploader.upload(path, { resource_type: 'auto' });
-    console.log(result.secure_url);
-    return result.secure_url;
+    const result = yield cloudinary_1.v2.uploader.upload(path, { resource_type: 'auto' });
+    // console.log(result.secure_url)
+    const url = cloudinary_1.v2.url(result.public_id, {
+        transformation: [
+            {
+                fetch_format: 'auto',
+                quality: 'auto'
+            }, {
+                crop: 'auto',
+                gravity: 'auto',
+                width: 600,
+                height: 600,
+            }
+        ]
+    });
+    console.log(url);
+    return url;
 });
 exports.upload_cloud = upload_cloud;
 //# sourceMappingURL=upload.js.map

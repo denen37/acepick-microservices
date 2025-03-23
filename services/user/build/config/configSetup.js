@@ -42,6 +42,8 @@ dotenv.config({ path: path_1.default.resolve(__dirname, "../../.env") });
 const getConfig = () => {
     return {
         PORT: Number(process.env.PORT),
+        JOBS_PORT: Number(process.env.JOBS_PORT),
+        HOST: process.env.HOST,
         NODE_ENV: process.env.NODE_ENV,
         DB_NAME: process.env.DB_NAME,
         DB_USER: process.env.DB_USER,
@@ -58,8 +60,9 @@ const getConfig = () => {
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
         RABBITMQ_URL: process.env.RABBITMQ_URL,
-        INTERNAL_HOST: process.env.INTERNAL_HOST,
-        JOBS_PORT: Number(process.env.JOBS_PORT),
+        CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
+        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
         PUBLIC_ROUTES: [
             '/api',
             '/',

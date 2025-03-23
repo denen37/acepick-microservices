@@ -34,6 +34,7 @@ import { sendExpoNotification } from "../services/expo";
 import { Professional } from "../models/Professional";
 import axios from "axios";
 import { verify } from "jsonwebtoken";
+import { upload_cloud } from "../utils/upload";
 
 
 // instantiate your stream client using the API key and secret
@@ -545,7 +546,9 @@ export const upload_avatar = async (req: Request, res: Response) => {
         return successResponseFalse(res, "No file uploaded")
     }
 
-    return successResponse(res, "Successful", { filePath })
+    const url = await upload_cloud(filePath);
+
+    return successResponse(res, "Successful", { url })
 }
 
 
@@ -580,9 +583,9 @@ export const registerStepThree = async (req: Request, res: Response) => {
     let profession: any;
 
     try {
-        let sectorResult = await axios.get(`http://${config.INTERNAL_HOST}:${config.JOBS_PORT}/api/jobs/sectors/${sectorId}`)
+        let sectorResult = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/sectors/${sectorId}`)
 
-        let profResult = await axios.get(`http://${config.INTERNAL_HOST}:${config.JOBS_PORT}/api/jobs/profs/${professionId}`)
+        let profResult = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/profs/${professionId}`)
 
         sector = sectorResult.data.data
 

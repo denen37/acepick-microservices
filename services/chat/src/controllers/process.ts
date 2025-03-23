@@ -6,6 +6,9 @@ import { Message } from "../models/Message";
 import { ChatRoom } from "../models/ChatRoom";
 import { Op } from "sequelize";
 import { randomId } from "../utils/modules";
+import http from "http";
+import path from "path";
+import fs from "fs";
 
 export interface ChatMessage {
     to: string;
@@ -50,7 +53,7 @@ export const getContacts = async (io: Server, socket: Socket) => {
     }
 
     if (user.role === 'client') {
-        const result = await axios.get(`${config.AUTH_BASE_URL}/api/profiles/get_professionals`, {
+        const result = await axios.post(`${config.AUTH_BASE_URL}/api/profiles/get_professionals`, {}, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -129,4 +132,87 @@ export const getMsgs = async (io: Server, socket: Socket, data: any) => {
     })
 
     io.to(data.room).emit(Emit.RECV_MSGs, normalizedMessages);
+}
+
+export const getPrevChats = async (io: Server, socket: Socket, data: any) => {
+    console.log("get prev chats")
+
+    const chatrooms = await ChatRoom.findAll({
+        where: {
+            members: {
+                [Op.like]: `%${socket.user.id}%`
+            }
+        }
+    });
+
+    const partners = chatrooms.map((room) => {
+        const members = room.members.split(",");
+        return members.filter((member) => member !== socket.user.id)[0];
+    })
+
+
+
+    const result = await axios.post(`${config.AUTH_BASE_URL}/api/profiles/get_professionals`,
+        { userIds: partners },
+        {
+            headers: {
+                Authorization: `Bearer ${socket.handshake.auth.token}`
+            }
+        }
+    )
+
+    socket.emit(Emit.GOT_PREV_CHATS, result.data.data);
+}
+
+
+export const uploadFile = async (io: Server, socket: Socket, data: any) => {
+    const { image, fileName } = data;
+    const uploadDir = path.join(__dirname, "../../public/uploads");
+
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir);
+    }
+
+    const fileExt = path.extname(fileName).toLowerCase();
+
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    const documentExtensions = [".pdf", ".doc", ".docx", ".txt", ".xlsx"];
+
+    let tag = ""
+    if (imageExtensions.includes(fileExt)) {
+        tag = '<img>'
+    } else if (documentExtensions.includes(fileExt)) {
+        tag = '<doc>'
+    }
+
+    const filePath = path.join(uploadDir, `${Date.now()}-${fileName}`);
+
+    fs.writeFile(filePath, Buffer.from(image), async (err) => {
+        if (err) {
+            console.error("Error saving image:", err);
+            return;
+        }
+
+        const imageUrl = `http://${config.HOST}:${config.PORT}/uploads/${path.basename(filePath)}`;
+        console.log(`Image saved and broadcasted: ${imageUrl}`);
+
+        let room = await ChatRoom.findOne({
+            where: {
+                name: data.room
+            }
+        })
+
+        if (!room) {
+            return
+        }
+
+        const message = await Message.create({
+            text: `${tag}${imageUrl}`,
+            from: data.from,
+            timestamp: new Date(),
+            chatroomId: room?.id
+        })
+
+        io.to(room.name).emit(Emit.RECV_FILE, message);
+    });
 }

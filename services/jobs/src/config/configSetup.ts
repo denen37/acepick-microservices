@@ -3,7 +3,9 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 type Config = {
+    HOST: string | undefined;
     PORT: number | undefined;
+    AUTH_PORT: number | undefined;
     NODE_ENV: string | undefined;
     DB_NAME: string | undefined;
     DB_USER: string | undefined;
@@ -15,11 +17,13 @@ type Config = {
     REDIS_INSTANCE_URL: string | undefined;
     PAYSTACK_SECRET: string | undefined;
     RABBITMQ_URL: string | undefined;
-    AUTH_BASE_URL: string | undefined;
+
 };
 
 const getConfig = (): Config => {
     return {
+        HOST: process.env.HOST,
+        AUTH_PORT: Number(process.env.AUTH_PORT),
         PORT: Number(process.env.PORT),
         NODE_ENV: process.env.NODE_ENV,
         DB_NAME: process.env.DB_NAME,
@@ -31,7 +35,6 @@ const getConfig = (): Config => {
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
         RABBITMQ_URL: process.env.RABBITMQ_URL,
-        AUTH_BASE_URL: process.env.AUTH_BASE_URL,
         PUBLIC_ROUTES: [
             "/api/jobs/search_profs",
             "/api/jobs/get_profs"

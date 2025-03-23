@@ -36,6 +36,7 @@ const redis_1 = require("../services/redis");
 const Professional_1 = require("../models/Professional");
 const axios_1 = __importDefault(require("axios"));
 const jsonwebtoken_2 = require("jsonwebtoken");
+const upload_1 = require("../utils/upload");
 // instantiate your stream client using the API key and secret
 // the secret is only used server side and gives you full access to the API
 const serverClient = stream_chat_1.StreamChat.getInstance('zzfb7h72xhc5', '5pfxakc5zasma3hw9awd2qsqgk2fxyr4a5qb3au4kkdt27d7ttnca7vnusfuztud');
@@ -466,7 +467,8 @@ const upload_avatar = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     if (!filePath) {
         return (0, utility_1.successResponseFalse)(res, "No file uploaded");
     }
-    return (0, utility_1.successResponse)(res, "Successful", { filePath });
+    const url = yield (0, upload_1.upload_cloud)(filePath);
+    return (0, utility_1.successResponse)(res, "Successful", { url });
 });
 exports.upload_avatar = upload_avatar;
 const registerStepTwo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -488,8 +490,8 @@ const registerStepThree = (req, res) => __awaiter(void 0, void 0, void 0, functi
     let sector;
     let profession;
     try {
-        let sectorResult = yield axios_1.default.get(`http://${configSetup_1.default.INTERNAL_HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/sectors/${sectorId}`);
-        let profResult = yield axios_1.default.get(`http://${configSetup_1.default.INTERNAL_HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/profs/${professionId}`);
+        let sectorResult = yield axios_1.default.get(`http://${configSetup_1.default.HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/sectors/${sectorId}`);
+        let profResult = yield axios_1.default.get(`http://${configSetup_1.default.HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/profs/${professionId}`);
         sector = sectorResult.data.data;
         profession = profResult.data.data;
     }

@@ -32,7 +32,7 @@ export const getCooperates = async (req: Request, res: Response) => {
 
     try {
         if (search) {
-            let result = await axios.get(`http://${config.INTERNAL_HOST}:${config.JOBS_PORT}/api/jobs/search_profs?search=${search}`)
+            let result = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/search_profs?search=${search}`)
 
             searchids = result.data.data.map((item: any) => item.id)
 
@@ -55,19 +55,25 @@ export const getCooperates = async (req: Request, res: Response) => {
 
 export const getProfessionals = async (req: Request, res: Response) => {
     let { search } = req.query;
+    let { userIds }: { userIds: string[] } = req.body;
 
     //Send a message to jobs to return professionals
     let searchids: number[] = [];
 
     try {
         if (search) {
-            let result = await axios.get(`http://${config.INTERNAL_HOST}:${config.JOBS_PORT}/api/jobs/search_profs?search=${search}`)
+            let result = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/search_profs?search=${search}`)
 
             searchids = result.data.data.map((item: any) => item.id)
         }
 
+        let whereCondition: { [key: string]: any } = searchids.length > 0 ? { professionId: searchids } : {};
 
-        const whereCondition = searchids.length > 0 ? { professionId: searchids } : {};
+        if (userIds && userIds.length > 0) {
+            whereCondition.userId = userIds;
+        }
+
+        // console.log(whereCondition)
 
         let professionals = await Professional.findAll({
             where: whereCondition,
@@ -85,7 +91,7 @@ export const getProfessionals = async (req: Request, res: Response) => {
         })
 
 
-        let result = await axios.post(`http://${config.INTERNAL_HOST}:${config.JOBS_PORT}/api/jobs/get_profs`,
+        let result = await axios.post(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/get_profs`,
             { profIds: professionals.map(prof => prof.professionId), }
         )
 
@@ -103,7 +109,6 @@ export const getProfessionals = async (req: Request, res: Response) => {
         return errorResponse(res, 'error', err);
     }
 }
-
 
 export const ProfAccountInfo = async (req: Request, res: Response) => {
     const { id } = req.user;
@@ -145,3 +150,23 @@ export const ProfAccountInfo = async (req: Request, res: Response) => {
     if (!profile) return errorResponse(res, "Failed", { status: false, message: "Profile Does'nt exist" })
     return successResponse(res, "Successful", profile)
 };
+
+export const updateProfile = async (req: Request, res: Response) => {
+    let { id, role } = req.user;
+
+    try {
+        console.log(req.user);
+
+        const profile = await Profile.findOne({
+            where: { userId: id }
+        })
+
+        const updatedProfile = await profile?.update(req.body);
+
+        await profile?.save();
+
+        return successResponse(res, "Successful", updatedProfile);
+    } catch (error) {
+        return errorResponse(res, "Failed", error)
+    }
+}
