@@ -18,6 +18,9 @@ type Config = {
     CLOUDINARY_NAME: string | undefined;
     CLOUDINARY_API_KEY: string | undefined;
     CLOUDINARY_API_SECRET: string | undefined;
+    CRYPTO_SECRET_KEY: string | undefined;
+    CRYPTO_IV: string | undefined;
+
 };
 
 const getConfig = (): Config => {
@@ -36,6 +39,8 @@ const getConfig = (): Config => {
         CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
         CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
         CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+        CRYPTO_SECRET_KEY: process.env.CRYPTO_SECRET_KEY,
+        CRYPTO_IV: process.env.CRYPTO_IV,
         PUBLIC_ROUTES: [
             '/api',
             '/',

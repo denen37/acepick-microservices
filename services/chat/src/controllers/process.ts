@@ -9,6 +9,7 @@ import { randomId } from "../utils/modules";
 import http from "http";
 import path from "path";
 import fs from "fs";
+import { decryptMessage, encryptMessage } from "../utils/secret";
 
 export interface ChatMessage {
     to: string;
@@ -30,7 +31,7 @@ export const sendMessage = async (io: Server, socket: Socket, data: ChatMessage)
     }
 
     const message = await Message.create({
-        text: data.text,
+        text: encryptMessage(data.text),
         from: data.from,
         timestamp: new Date(),
         chatroomId: room?.id
@@ -42,6 +43,8 @@ export const sendMessage = async (io: Server, socket: Socket, data: ChatMessage)
 
 export const onDisconnect = async (socket: Socket) => {
     console.log(`User disconnected: ${socket.id}`);
+
+    delete global.onlineUsers[socket.user.id]
 }
 
 export const getContacts = async (io: Server, socket: Socket) => {
@@ -126,7 +129,7 @@ export const getMsgs = async (io: Server, socket: Socket, data: any) => {
         normalizedMessages.push({
             to: members?.filter((member) => member !== msg.from)[0],
             from: msg.from,
-            text: msg.text,
+            text: decryptMessage(msg.text),
             timestamp: msg.timestamp,
         })
     })
@@ -135,7 +138,6 @@ export const getMsgs = async (io: Server, socket: Socket, data: any) => {
 }
 
 export const getPrevChats = async (io: Server, socket: Socket, data: any) => {
-    console.log("get prev chats")
 
     const chatrooms = await ChatRoom.findAll({
         where: {
@@ -161,7 +163,13 @@ export const getPrevChats = async (io: Server, socket: Socket, data: any) => {
         }
     )
 
-    socket.emit(Emit.GOT_PREV_CHATS, result.data.data);
+    const prevChats = result.data.data.map((member: any) => {
+        return {
+            ...member, online: Boolean(global.onlineUsers[member.user.id])
+        }
+    })
+
+    socket.emit(Emit.GOT_PREV_CHATS, prevChats);
 }
 
 
@@ -207,7 +215,7 @@ export const uploadFile = async (io: Server, socket: Socket, data: any) => {
         }
 
         const message = await Message.create({
-            text: `${tag}${imageUrl}`,
+            text: encryptMessage(`${tag}${imageUrl}`),
             from: data.from,
             timestamp: new Date(),
             chatroomId: room?.id

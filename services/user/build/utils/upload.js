@@ -36,7 +36,7 @@ const pathExistsOrCreate = (dirPath) => {
 };
 const imageStorage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, pathExistsOrCreate('../public/images'));
+        cb(null, pathExistsOrCreate('../../public/uploads'));
     },
     filename: (req, file, cb) => {
         let filename = Date.now() + "--" + file.originalname;
