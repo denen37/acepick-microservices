@@ -20,7 +20,7 @@ const isAuthorized = async (req: Request, res: Response, next: NextFunction) => 
     if (!token) return handleResponse(res, 401, false, `Access Denied / Unauthorized request`);
 
     try {
-        let result = await axios.post(`http://${config.HOST}:${config.PORT} /api/auth/verify-token`, { token })
+        let result = await axios.post(`${config.AUTH_BASE_URL}/api/auth/verify-token`, { token })
 
         let verified = result.data.data
 

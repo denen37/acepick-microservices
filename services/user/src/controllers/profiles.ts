@@ -32,7 +32,7 @@ export const getCooperates = async (req: Request, res: Response) => {
 
     try {
         if (search) {
-            let result = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/search_profs?search=${search}`)
+            let result = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/search_profs?search=${search}`)
 
             searchids = result.data.data.map((item: any) => item.id)
 
@@ -62,7 +62,7 @@ export const getProfessionals = async (req: Request, res: Response) => {
 
     try {
         if (search) {
-            let result = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/search_profs?search=${search}`)
+            let result = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/search_profs?search=${search}`)
 
             searchids = result.data.data.map((item: any) => item.id)
         }
@@ -91,7 +91,7 @@ export const getProfessionals = async (req: Request, res: Response) => {
         })
 
 
-        let result = await axios.post(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/get_profs`,
+        let result = await axios.post(`${config.JOBS_BASE_URL}/api/jobs/get_profs`,
             { profIds: professionals.map(prof => prof.professionId), }
         )
 

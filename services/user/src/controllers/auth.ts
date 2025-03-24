@@ -583,9 +583,9 @@ export const registerStepThree = async (req: Request, res: Response) => {
     let profession: any;
 
     try {
-        let sectorResult = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/sectors/${sectorId}`)
+        let sectorResult = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/sectors/${sectorId}`)
 
-        let profResult = await axios.get(`http://${config.HOST}:${config.JOBS_PORT}/api/jobs/profs/${professionId}`)
+        let profResult = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/profs/${professionId}`)
 
         sector = sectorResult.data.data
 
