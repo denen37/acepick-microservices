@@ -214,13 +214,15 @@ export const uploadFile = async (io: Server, socket: Socket, data: any) => {
             return
         }
 
+        let url = `${tag}${imageUrl}`
+
         const message = await Message.create({
-            text: encryptMessage(`${tag}${imageUrl}`),
+            text: encryptMessage(url),
             from: data.from,
             timestamp: new Date(),
             chatroomId: room?.id
         })
 
-        io.to(room.name).emit(Emit.RECV_FILE, message);
+        io.to(room.name).emit(Emit.RECV_FILE, { ...message.dataValues, text: url });
     });
 }
