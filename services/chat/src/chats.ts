@@ -8,6 +8,7 @@ import { Op } from 'sequelize';
 
 export default function chatSocket(httpServer: any, URL?: string) {
     const io = new Server(httpServer, {
+        path: '/chat',
         cors: {
             origin: '*',
             credentials: true,
