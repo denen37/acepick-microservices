@@ -16,12 +16,12 @@ const io = new Server(server, {
     },
 });
 
-app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")))
+app.use("chat/uploads", express.static(path.join(__dirname, "../public/uploads")))
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/chat", (req, res) => {
     res.send("Chat App Backend Running...");
 });
 
