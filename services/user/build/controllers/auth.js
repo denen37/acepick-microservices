@@ -490,8 +490,8 @@ const registerStepThree = (req, res) => __awaiter(void 0, void 0, void 0, functi
     let sector;
     let profession;
     try {
-        let sectorResult = yield axios_1.default.get(`http://${configSetup_1.default.HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/sectors/${sectorId}`);
-        let profResult = yield axios_1.default.get(`http://${configSetup_1.default.HOST}:${configSetup_1.default.JOBS_PORT}/api/jobs/profs/${professionId}`);
+        let sectorResult = yield axios_1.default.get(`${configSetup_1.default.JOBS_BASE_URL}/api/jobs/sectors/${sectorId}`);
+        let profResult = yield axios_1.default.get(`${configSetup_1.default.JOBS_BASE_URL}/api/jobs/profs/${professionId}`);
         sector = sectorResult.data.data;
         profession = profResult.data.data;
     }

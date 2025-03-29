@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors({ origin: true }));
 
 
-app.get('/jobs/', (req: Request, res: Response) => {
+app.get('/api/jobs', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Hello, world! This is the jobs service' });
 });
 

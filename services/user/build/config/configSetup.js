@@ -42,8 +42,8 @@ dotenv.config({ path: path_1.default.resolve(__dirname, "../../.env") });
 const getConfig = () => {
     return {
         PORT: Number(process.env.PORT),
-        JOBS_PORT: Number(process.env.JOBS_PORT),
         HOST: process.env.HOST,
+        JOBS_BASE_URL: process.env.JOBS_BASE_URL,
         NODE_ENV: process.env.NODE_ENV,
         DB_NAME: process.env.DB_NAME,
         DB_USER: process.env.DB_USER,

@@ -36,8 +36,10 @@ const getConfig = (): Config => {
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
         RABBITMQ_URL: process.env.RABBITMQ_URL,
         PUBLIC_ROUTES: [
+            "/api/jobs",
             "/api/jobs/search_profs",
-            "/api/jobs/get_profs"
+            "/api/jobs/get_profs",
+
         ],
     };
 };
