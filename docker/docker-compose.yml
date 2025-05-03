@@ -2,7 +2,7 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx
-    build: ./docker
+    build: .
     # restart: always
     ports:
       - "80:80"
