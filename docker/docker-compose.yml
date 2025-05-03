@@ -202,7 +202,7 @@ services:
     env_file:
       - ../services/payment/.env
     ports:
-      - 3309:3306
+      - 3307:3306
     volumes:
       - payment-data:/var/lib/mysql
     networks:
