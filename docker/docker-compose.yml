@@ -2,8 +2,9 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx
-    build: .
-    # restart: always
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "80:80"
       - "443:443"
