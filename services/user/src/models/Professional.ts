@@ -3,6 +3,7 @@ import { User } from './User';
 // import { Profession } from './Profession';
 // import { Profile } from './Profile';
 import { Cooperation } from './Cooperation';
+import { Profile } from './Profile';
 // import { Review } from './Review';
 
 
@@ -45,7 +46,7 @@ export class Professional extends Model {
     @Default(true)
     @AllowNull(true)
     @Column(DataType.BOOLEAN)
-    avaialable!: string;
+    avaialable!: boolean;
 
 
     @Default(WorkType.IDLE)
@@ -53,48 +54,11 @@ export class Professional extends Model {
     workType!: WorkType;
 
 
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalJobCompleted!: string;
 
 
     @Default(0)
     @Column(DataType.INTEGER)
-    totalJobCanceled!: string;
-
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalReview!: string;
-
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalJobPending!: string;
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalJobOngoing!: string;
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalJobRejected!: string;
-
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalEarning!: string;
-
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalDispute!: string;
+    totalEarning!: number;
 
 
 
@@ -141,10 +105,18 @@ export class Professional extends Model {
 
 
 
+    @ForeignKey(() => Profile)
+    @AllowNull(false)
+    @Column(DataType.INTEGER)
+    profileId!: number;
+
+
+
     @ForeignKey(() => User)
     @AllowNull(false)
     @Column(DataType.UUID)
     userId!: string;
+
 
     @AllowNull(false)
     // @ForeignKey(() => Profession)
@@ -166,6 +138,11 @@ export class Professional extends Model {
 
     // @BelongsTo(() => Profession, { onDelete: 'CASCADE' })
     // profession!: Profession;
+
+
+    @BelongsTo(() => Profile, { onDelete: 'CASCADE' })
+    profile!: Profile;
+
 
 
     @BelongsTo(() => User, { onDelete: 'CASCADE' })

@@ -1,6 +1,6 @@
 // Import packages
 import { Router } from 'express';
-import {/* ProfAccountInfo, accountInfo, accountSingleInfo,*/ authorize, changePassword, corperateReg, deleteUsers, login, passwordChange, register, registerStepThree, registerStepTwo, sendOtp, swithAccount, updateFcmToken, /*updateProfessional*/ updateProfile, upload_avatar, verifyBvnDetail, verifyMyBvn, verifyOtp } from '../controllers/auth';
+import {/* ProfAccountInfo, accountInfo, accountSingleInfo,*/ authorize, changePassword, corperateReg, deleteUsers, login, passwordChange, register, registerStepThree, registerStepTwo, sendOtp, swithAccount, updateFcmToken, /*updateProfessional*/ updateProfile, upload_avatar, /*verifyBvnDetail,*/ verifyMyBvn, verifyOtp } from '../controllers/auth';
 import { uploads } from '../utils/upload';
 
 
@@ -28,7 +28,7 @@ routes.post('/change-password-loggedin', passwordChange);
 routes.post('/change-password-forgot', changePassword);
 routes.post('/verify-otp', verifyOtp);
 routes.post('/update-fcm-token', updateFcmToken)
-routes.post("/verify-bvn", verifyBvnDetail)
+// routes.post("/verify-bvn", verifyBvnDetail)
 routes.post("/verify-bvn2", verifyMyBvn);
 routes.get("/delete-users", deleteUsers)
 routes.post('/verify-token', authorize)

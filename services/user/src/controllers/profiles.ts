@@ -2,13 +2,27 @@ import { Request, Response } from "express"
 import { Cooperation } from "../models/Cooperation";
 import { Profile } from "../models/Profile";
 import { User } from "../models/User";
-import { errorResponse, successResponse } from "../utils/utility";
+import { errorResponse, handleResponse, successResponse } from "../utils/utility";
 import { Professional } from "../models/Professional";
 // import { PublishMessage } from "../events/handler";
-import { Wallet, WalletType } from "../models/Wallet";
 import { randomUUID } from "crypto";
 import axios from "axios";
 import config from '../config/configSetup'
+
+enum Metrics {
+    ONGOING = 'ongoing',
+    PENDING = 'pending',
+    DECLINED = 'declined',
+    COMPLETED = 'completed',
+    CANCELLED = 'cancelled',
+    APPROVED = 'approved',
+    REVIEWS = 'reviews',
+}
+
+enum MetricOperation {
+    INCREMENT = 'increment',
+    DECREMENT = 'decrement',
+}
 
 
 export const getCooperates = async (req: Request, res: Response) => {
@@ -32,7 +46,7 @@ export const getCooperates = async (req: Request, res: Response) => {
 
     try {
         if (search) {
-            let result = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/search_profs?search=${search}`)
+            let result = await axios.get(`${config.JOBS_BASE_URL}/jobs-api/search_profs?search=${search}`)
 
             searchids = result.data.data.map((item: any) => item.id)
 
@@ -58,11 +72,15 @@ export const getProfessionals = async (req: Request, res: Response) => {
     let { userIds }: { userIds: string[] } = req.body;
 
     //Send a message to jobs to return professionals
-    let searchids: number[] = [];
-
     try {
+        let searchids: number[] = [];
+
         if (search) {
-            let result = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/search_profs?search=${search}`)
+            let result = await axios.get(`${config.JOBS_BASE_URL}/jobs-api/search_profs?search=${search}`, {
+                headers: {
+                    Authorization: req.headers.authorization
+                }
+            })
 
             searchids = result.data.data.map((item: any) => item.id)
         }
@@ -91,8 +109,13 @@ export const getProfessionals = async (req: Request, res: Response) => {
         })
 
 
-        let result = await axios.post(`${config.JOBS_BASE_URL}/api/jobs/get_profs`,
-            { profIds: professionals.map(prof => prof.professionId), }
+        let result = await axios.post(`${config.JOBS_BASE_URL}/jobs-api/get_profs`,
+            { profIds: professionals.map(prof => prof.professionId), },
+            {
+                headers: {
+                    Authorization: req.headers.authorization
+                }
+            }
         )
 
         const profList = result.data.data
@@ -105,14 +128,58 @@ export const getProfessionals = async (req: Request, res: Response) => {
 
 
         return successResponse(res, 'success', professionals)
-    } catch (err) {
-        return errorResponse(res, 'error', err);
+
+    } catch (error: any) {
+        return errorResponse(res, 'error', error);
     }
+}
+
+export const getProfessionalById = async (req: Request, res: Response) => {
+    let { userId } = req.params;
+
+    try {
+        const profile = await Profile.findOne({
+            where: { userId: userId },
+            attributes: {
+                exclude: []
+            },
+            include: [
+                {
+                    model: User,
+                    attributes: ["email", "phone"],
+                },
+                {
+                    model: Professional,
+                },
+                {
+                    model: Cooperation,
+                },
+            ],
+        })
+
+        //we need to get the profession of the user
+        const profResponse = await axios.get(`${config.JOBS_BASE_URL}/jobs-api/profs/${profile?.professional.professionId}`, {
+            headers: {
+                Authorization: req.headers.authorization
+            }
+        })
+
+        const profession = profResponse.data.data;
+
+        profile?.professional.setDataValue('profession', profession || null);
+
+        //TODO - we need to get the reviews of the user
+
+        return successResponse(res, 'success', profile);
+    } catch (error) {
+        return errorResponse(res, 'error', error);
+    }
+
 }
 
 export const ProfAccountInfo = async (req: Request, res: Response) => {
     const { id } = req.user;
-    const profile = await Professional.findOne(
+    const profile = await Profile.findOne(
         {
             where: { userId: id },
             attributes: {
@@ -121,33 +188,32 @@ export const ProfAccountInfo = async (req: Request, res: Response) => {
             include: [
                 {
                     model: User,
-                    attributes: [
-                        "email", "phone"],
-                    include: [{
-                        model: Wallet,
-                        where: {
-                            type: WalletType.PROFESSIONAL
-                        }
-                    },
-
-                    {
-                        model: Profile,
-                        attributes: [
-                            'createdAt', 'updatedAt', "fullName", "avatar", "lga", "state", "address", "bvn", "type"],
-
-                    }
-                    ]
+                    attributes: ["email", "phone"],
+                },
+                {
+                    model: Professional,
                 },
                 {
                     model: Cooperation,
                 },
-
-
             ],
 
         }
     )
+
+    const walletResponse = await axios.get(`${config.PAYMENT_BASE_URL}/pay-api/view-wallet`, {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    })
+
+    const wallet = walletResponse.data.data;
+
+    profile?.setDataValue('wallet', wallet);
+
     if (!profile) return errorResponse(res, "Failed", { status: false, message: "Profile Does'nt exist" })
+
+
     return successResponse(res, "Successful", profile)
 };
 
@@ -170,3 +236,79 @@ export const updateProfile = async (req: Request, res: Response) => {
         return errorResponse(res, "Failed", error)
     }
 }
+
+export const metricOperations = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const { payload }: {
+        payload: { field: string, action: string }[]
+    } = req.body;
+
+    const profile = await Profile.findOne({
+        where: { userId: userId },
+    })
+
+    if (!profile) return handleResponse(res, 404, false, "Profile Does not exist");
+
+    payload.forEach(item => {
+        switch (item.field) {
+            case Metrics.ONGOING:
+                if (item.action === MetricOperation.INCREMENT) {
+                    profile.totalJobsOngoing += 1;
+                } else {
+                    profile.totalJobsOngoing -= 1;
+                }
+                break;
+
+            case Metrics.COMPLETED:
+                if (item.action === MetricOperation.INCREMENT)
+                    profile.totalJobsCompleted += 1;
+                else
+                    profile.totalJobsCompleted -= 1;
+                break;
+
+            case Metrics.CANCELLED:
+                if (item.action === MetricOperation.INCREMENT)
+                    profile.totalJobsCanceled += 1;
+                else
+                    profile.totalJobsCanceled -= 1;
+                break;
+
+            case Metrics.PENDING:
+                if (item.action === MetricOperation.INCREMENT)
+                    profile.totalJobsPending += 1;
+                else
+                    profile.totalJobsPending -= 1;
+                break;
+
+
+            case Metrics.DECLINED:
+                if (item.action === MetricOperation.INCREMENT)
+                    profile.totalJobsDeclined += 1;
+                else
+                    profile.totalJobsDeclined -= 1;
+                break;
+
+            case Metrics.APPROVED:
+                if (item.action === MetricOperation.INCREMENT)
+                    profile.totalJobsApproved += 1;
+                else
+                    profile.totalJobsApproved -= 1;
+                break;
+
+
+            case Metrics.REVIEWS:
+                if (item.action === MetricOperation.INCREMENT)
+                    profile.totalReview += 1;
+                else
+                    profile.totalReview -= 1;
+            default:
+                break;
+        }
+
+    })
+    await profile.save();
+
+    return successResponse(res, 'success', 'Profile updated successfully');
+}
+
+

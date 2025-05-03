@@ -3,6 +3,8 @@ import { User } from './User';
 // import { Professional } from './Professional';
 import { LanLog } from './LanLog';
 import { VoiceRecording } from './VoiceRecording';
+import { Professional } from './Professional';
+import { Cooperation } from './Cooperation';
 // import { Review } from './Review';
 // import { ProfessionalSector } from './ProfessionalSector';
 // import { MarketPlace } from './Market';
@@ -74,12 +76,13 @@ export class Profile extends Model {
 
     @Default(0)
     @Column(DataType.INTEGER)
-    totalHire!: string;
+    totalJobs!: number;
+
 
 
     @Default(0)
     @Column(DataType.INTEGER)
-    totalExpense!: string;
+    totalExpense!: number;
 
 
 
@@ -87,55 +90,73 @@ export class Profile extends Model {
     @Default(0)
     @AllowNull(true)
     @Column(DataType.DECIMAL)
-    rate!: any;
+    rate!: number;
+
+
+    @Default(0)
+    @Column(DataType.INTEGER)
+    totalJobsDeclined!: number;
 
 
 
     @Default(0)
     @Column(DataType.INTEGER)
-    totalPendingHire!: string;
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    count!: string;
-
-
-
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalOngoingHire!: string;
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalCompletedHire!: string;
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalReview!: string;
-
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalJobRejected!: string;
-
-
-    @Default(0)
-    @Column(DataType.INTEGER)
-    totalJobCanceled!: string;
-
+    totalJobsPending!: number;
 
 
 
 
     @Default(0)
     @Column(DataType.INTEGER)
-    totalDisputes!: string;
+    count!: number;
+
+
+
+
+    @Default(0)
+    @Column(DataType.INTEGER)
+    totalJobsOngoing!: number;
+
+
+
+
+    @Default(0)
+    @Column(DataType.INTEGER)
+    totalJobsCompleted!: number;
+
+
+
+    @Default(0)
+    @Column(DataType.INTEGER)
+    totalReview!: number;
+
+
+
+
+    // @Default(0)
+    // @Column(DataType.INTEGER)
+    // totalJobsRejected!: number;
+
+
+
+    @Default(0)
+    @Column(DataType.INTEGER)
+    totalJobsApproved!: number;
+
+
+
+    @Default(0)
+    @Column(DataType.INTEGER)
+    totalJobsCanceled!: number;
+
+
+
+
+
+    @Default(0)
+    @Column(DataType.INTEGER)
+    totalDisputes!: number;
+
 
 
 
@@ -155,21 +176,21 @@ export class Profile extends Model {
     @Default(false)
     @AllowNull(true)
     @Column(DataType.BOOLEAN)
-    corperate!: any;
+    corperate!: boolean;
 
 
 
     @Default(false)
     @AllowNull(true)
     @Column(DataType.BOOLEAN)
-    switch!: any;
+    switch!: boolean;
 
 
 
     @Default(false)
     @AllowNull(true)
     @Column(DataType.BOOLEAN)
-    store!: any;
+    store!: boolean;
 
 
     // @ForeignKey(() => LanLog)
@@ -191,12 +212,17 @@ export class Profile extends Model {
     userId!: string;
 
 
+
     @BelongsTo(() => User, { onDelete: 'CASCADE' })
     user!: User;
 
 
-    // @HasOne(() => Professional)
-    // professional!: Professional;
+    @HasOne(() => Professional)
+    professional!: Professional;
+
+
+    @HasOne(() => Cooperation)
+    cooperation!: Cooperation;
 
 
     // @HasOne(() => MarketPlace)

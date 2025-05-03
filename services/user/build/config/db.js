@@ -25,7 +25,6 @@ const Profile_1 = require("../models/Profile");
 const User_1 = require("../models/User");
 const Verify_1 = require("../models/Verify");
 const VoiceRecording_1 = require("../models/VoiceRecording");
-const Wallet_1 = require("../models/Wallet");
 const sequelize = new sequelize_typescript_1.Sequelize(configSetup_1.default.DB_NAME || 'test', configSetup_1.default.DB_USER || 'user', configSetup_1.default.DB_PASSWORD, {
     port: configSetup_1.default.DB_PORT,
     host: configSetup_1.default.DB_HOST,
@@ -35,7 +34,7 @@ const sequelize = new sequelize_typescript_1.Sequelize(configSetup_1.default.DB_
     },
     logging: false,
     // models: [path.resolve(__dirname, "../models")],
-    models: [Certification_1.Certification, Cooperation_1.Cooperation, Education_1.Education, Experience_1.Experience, LanLog_1.LanLog, Portfolio_1.Portfolio, Professional_1.Professional, Profile_1.Profile, User_1.User, Verify_1.Verify, VoiceRecording_1.VoiceRecording, Wallet_1.Wallet]
+    models: [Certification_1.Certification, Cooperation_1.Cooperation, Education_1.Education, Experience_1.Experience, LanLog_1.LanLog, Portfolio_1.Portfolio, Professional_1.Professional, Profile_1.Profile, User_1.User, Verify_1.Verify, VoiceRecording_1.VoiceRecording]
 });
 sequelize.models;
 const MAX_RETRIES = 5;

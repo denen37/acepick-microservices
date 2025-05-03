@@ -14,7 +14,7 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const uuid_1 = require("uuid");
 const Profile_1 = require("./Profile");
 // import { Profile } from './Profile';
-const Wallet_1 = require("./Wallet");
+// import { Wallet } from './Wallet';
 const LanLog_1 = require("./LanLog");
 // import { Profession } from './Profession';
 // import { Jobs } from './Jobs';
@@ -102,16 +102,6 @@ __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM(UserState.STEP_ONE, UserState.STEP_TWO, UserState.STEP_THREE, UserState.VERIFIED)),
     __metadata("design:type", String)
 ], User.prototype, "state", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Wallet_1.Wallet),
-    (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", Number)
-], User.prototype, "walletId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasOne)(() => Wallet_1.Wallet),
-    __metadata("design:type", Wallet_1.Wallet)
-], User.prototype, "wallet", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => Profile_1.Profile),
     __metadata("design:type", Profile_1.Profile)

@@ -2,7 +2,7 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 import { v4 as uuidv4 } from 'uuid';
 import { Profile } from './Profile';
 // import { Profile } from './Profile';
-import { Wallet } from './Wallet';
+// import { Wallet } from './Wallet';
 import { LanLog } from './LanLog';
 // import { Profession } from './Profession';
 // import { Jobs } from './Jobs';
@@ -100,14 +100,14 @@ export class User extends Model {
     state!: UserState;
 
 
-    @ForeignKey(() => Wallet)
-    @AllowNull(true)
-    @Column(DataType.INTEGER)
-    walletId!: number;
+    // @ForeignKey(() => Wallet)
+    // @AllowNull(true)
+    // @Column(DataType.INTEGER)
+    // walletId!: number;
 
 
-    @HasOne(() => Wallet)
-    wallet!: Wallet;
+    // @HasOne(() => Wallet)
+    // wallet!: Wallet;
 
     @HasOne(() => Profile)
     profile!: Profile;

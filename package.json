@@ -10,15 +10,18 @@
   "workspaces": [
     "services/user",
     "services/jobs",
-    "services/chat"
+    "services/chat",
+    "services/payment"
   ],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "nodemailer": "^6.10.1",
     "typescript": "^5.7.3"
   },
   "devDependencies": {
-    "@types/node": "^22.13.4"
+    "@types/node": "^22.13.4",
+    "@types/uuid": "^10.0.0"
   }
 }

@@ -13,12 +13,12 @@ app.use(express.json());
 app.use(cors({ origin: true }));
 
 
-app.get('/api/jobs', (req: Request, res: Response) => {
+app.get('/jobs-api', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Hello, world! This is the jobs service' });
 });
 
 app.all('*', isAuthorized);
-app.use('/api/jobs', jobRoutes);
+app.use('/jobs-api/', jobRoutes);
 
 db.sync({ alter: true }).then(() => {
     app.listen(

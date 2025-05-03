@@ -13,18 +13,23 @@ export class Material extends Model {
 
     @AllowNull(false)
     @Column(DataType.INTEGER)
-    quantity!: string
+    quantity!: number;
 
 
 
     @AllowNull(true)
+    @Column(DataType.STRING(20))
+    unit!: string;
+
+
+    @AllowNull(true)
     @Column(DataType.INTEGER)
-    subTotal!: string
+    subTotal!: number
 
 
     @AllowNull(false)
     @Column(DataType.INTEGER)
-    price!: string
+    price!: number
 
     @ForeignKey(() => Job)
     @AllowNull(false)

@@ -29,6 +29,7 @@ export const isAuthorized = async (req: Request, res: Response, next: NextFuncti
     } else {
         req.user = verified;
     }
+
     next();
 
 };

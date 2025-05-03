@@ -15,6 +15,7 @@ const User_1 = require("./User");
 // import { Profession } from './Profession';
 // import { Profile } from './Profile';
 const Cooperation_1 = require("./Cooperation");
+const Profile_1 = require("./Profile");
 // import { Review } from './Review';
 // export enum UserGender {
 // 	MALE = 'MALE',
@@ -54,7 +55,7 @@ __decorate([
     (0, sequelize_typescript_1.Default)(true),
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BOOLEAN),
-    __metadata("design:type", String)
+    __metadata("design:type", Boolean)
 ], Professional.prototype, "avaialable", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(WorkType.IDLE),
@@ -64,43 +65,8 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Professional.prototype, "totalJobCompleted", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Professional.prototype, "totalJobCanceled", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Professional.prototype, "totalReview", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Professional.prototype, "totalJobPending", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Professional.prototype, "totalJobOngoing", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Professional.prototype, "totalJobRejected", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Professional.prototype, "totalEarning", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(0),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Professional.prototype, "totalDispute", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0.0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL),
@@ -138,6 +104,12 @@ __decorate([
     __metadata("design:type", Object)
 ], Professional.prototype, "online", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => Profile_1.Profile),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
+], Professional.prototype, "profileId", void 0);
+__decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.UUID),
@@ -161,6 +133,10 @@ __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
     __metadata("design:type", Number)
 ], Professional.prototype, "corperateId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Profile_1.Profile, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Profile_1.Profile)
+], Professional.prototype, "profile", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { onDelete: 'CASCADE' }),
     __metadata("design:type", User_1.User)

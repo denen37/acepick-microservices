@@ -13,6 +13,8 @@ exports.Profile = exports.ProfileType = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = require("./User");
 const VoiceRecording_1 = require("./VoiceRecording");
+const Professional_1 = require("./Professional");
+const Cooperation_1 = require("./Cooperation");
 // import { Review } from './Review';
 // import { ProfessionalSector } from './ProfessionalSector';
 // import { MarketPlace } from './Market';
@@ -75,58 +77,63 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Profile.prototype, "totalHire", void 0);
+    __metadata("design:type", Number)
+], Profile.prototype, "totalJobs", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Profile.prototype, "totalExpense", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Profile.prototype, "rate", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Profile.prototype, "totalPendingHire", void 0);
+    __metadata("design:type", Number)
+], Profile.prototype, "totalJobsDeclined", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
+], Profile.prototype, "totalJobsPending", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)(0),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
+    __metadata("design:type", Number)
 ], Profile.prototype, "count", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Profile.prototype, "totalOngoingHire", void 0);
+    __metadata("design:type", Number)
+], Profile.prototype, "totalJobsOngoing", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Profile.prototype, "totalCompletedHire", void 0);
+    __metadata("design:type", Number)
+], Profile.prototype, "totalJobsCompleted", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Profile.prototype, "totalReview", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Profile.prototype, "totalJobRejected", void 0);
+    __metadata("design:type", Number)
+], Profile.prototype, "totalJobsApproved", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
-], Profile.prototype, "totalJobCanceled", void 0);
+    __metadata("design:type", Number)
+], Profile.prototype, "totalJobsCanceled", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Profile.prototype, "totalDisputes", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
@@ -142,19 +149,19 @@ __decorate([
     (0, sequelize_typescript_1.Default)(false),
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BOOLEAN),
-    __metadata("design:type", Object)
+    __metadata("design:type", Boolean)
 ], Profile.prototype, "corperate", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BOOLEAN),
-    __metadata("design:type", Object)
+    __metadata("design:type", Boolean)
 ], Profile.prototype, "switch", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
     (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BOOLEAN),
-    __metadata("design:type", Object)
+    __metadata("design:type", Boolean)
 ], Profile.prototype, "store", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
@@ -166,6 +173,14 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, { onDelete: 'CASCADE' }),
     __metadata("design:type", User_1.User)
 ], Profile.prototype, "user", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => Professional_1.Professional),
+    __metadata("design:type", Professional_1.Professional)
+], Profile.prototype, "professional", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => Cooperation_1.Cooperation),
+    __metadata("design:type", Cooperation_1.Cooperation)
+], Profile.prototype, "cooperation", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => VoiceRecording_1.VoiceRecording, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)

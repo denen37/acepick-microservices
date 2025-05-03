@@ -20,12 +20,14 @@ export enum DisputeStatus {
 
 @Table({ timestamps: true, tableName: 'dispute' })
 export class Dispute extends Model {
-
+    @AllowNull(false)
+    @Column(DataType.STRING)
+    reason!: string;
 
 
     @AllowNull(false)
-    @Column(DataType.STRING)
-    cause!: string;
+    @Column(DataType.TEXT)
+    description!: string;
 
     @Default(DisputeStatus.PENDING)
     @Column(DataType.ENUM(DisputeStatus.RESOLVED, DisputeStatus.PENDING, DisputeStatus.SUPERADMIN))
@@ -34,7 +36,7 @@ export class Dispute extends Model {
 
     @AllowNull(true)
     @Column(DataType.STRING)
-    url!: any;
+    url!: string;
 
 
     @ForeignKey(() => Job)

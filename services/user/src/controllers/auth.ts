@@ -8,7 +8,6 @@ import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { Profile, ProfileType } from "../models/Profile";
 // import { Professional } from "../models/Professional";
-import { Wallet, WalletType } from "../models/Wallet";
 import { LanLog } from "../models/LanLog";
 // import { Sector } from "../models/Sector";
 // import { Profession } from "../models/Profession";
@@ -27,7 +26,7 @@ import { Portfolio } from "../models/Portfolio";
 // import { Dispute } from "../models/Dispute";
 // import { CreditType, TransactionType, Transactions } from "../models/Transaction";
 import { Sequelize } from "sequelize-typescript";
-import { Redis } from "../services/redis";
+// import { Redis } from "../services/redis";
 // import { ProfessionalSector } from "../models/ProfessionalSector";
 import { Op } from "sequelize";
 import { sendExpoNotification } from "../services/expo";
@@ -317,9 +316,7 @@ export const register = async (req: Request, res: Response): Promise<any> => {
             email, phone, password: hashedPassword, role
         })
 
-        //TODO use a request to payment create the wallet
-        const wallet = await Wallet.create({ userId: user.id })
-        // await user.update({ walletId: wallet.id })
+
         const emailServiceId = randomId(12);
         const codeEmail = String(Math.floor(1000 + Math.random() * 9000));
         await Verify.create({
@@ -372,7 +369,6 @@ export const register = async (req: Request, res: Response): Promise<any> => {
 export const passwordChange = async (req: Request, res: Response) => {
     let { password, confirmPassword } = req.body;
     const { id } = req.user;
-    console.log("id", id);
     if (password !== confirmPassword) return errorResponse(res, "Password do not match", { status: false, message: "Password do not match" })
 
     const user = await User.findOne({ where: { id } })
@@ -390,36 +386,50 @@ export const passwordChange = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
     let { email, password, type, fcmToken } = req.body;
 
-    const user = await User.findOne({ where: { email } })
+    try {
+        const user = await User.findOne({ where: { email } })
 
-    if (!user) return handleResponse(res, 404, false, "User does not exist")
+        if (!user) return handleResponse(res, 404, false, "User does not exist")
 
-    const match = await compare(password, user.password)
+        const match = await compare(password, user.password)
 
-    if (!match) return handleResponse(res, 404, false, "Invalid Credentials")
+        if (!match) return handleResponse(res, 404, false, "Invalid Credentials")
 
-    let token = sign({ id: user.id, email: user.email, role: user.role }, config.TOKEN_SECRET);
+        let token = sign({ id: user.id, email: user.email, role: user.role }, config.TOKEN_SECRET);
 
-    const chatToken = serverClient.createToken(`${String(user.id)}`);
+        const chatToken = serverClient.createToken(`${String(user.id)}`);
 
-    const profile = await Profile.findOne({ where: { userId: user.id } })
+        const profile = await Profile.findOne({ where: { userId: user.id } })
 
-    await profile?.update({ fcmToken })
+        await profile?.update({ fcmToken })
 
-    const profileUpdated = await Profile.findOne({
-        where: { userId: user.id },
-        include: [{
-            model: User,
-            attributes: ['id', 'email', 'phone', 'fcmToken', 'status'],
+
+        const profileUpdated = await Profile.findOne({
+            where: { userId: user.id },
             include: [{
-                model: Wallet
+                model: User,
+                attributes: ['id', 'email', 'phone', 'fcmToken', 'status'],
+                // include: [{
+                //     model: Wallet
+                // }]
             }]
-        }]
-    })
+        })
+        const walletResponse = await axios.get(`${config.PAYMENT_BASE_URL}/pay-api/view-wallet`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+
+        const wallet = walletResponse.data.data;
+
+        profileUpdated?.setDataValue('wallet', wallet);
 
 
-    return successResponse(res, "Successful", { status: true, profile: profileUpdated, token, chatToken })
+        return successResponse(res, "Successful", { status: true, profile: profileUpdated, token, chatToken })
 
+    } catch (error: any) {
+        return errorResponse(res, 'error', error.message);
+    }
 
     // profile?.fcmToken == null ? null : sendExpoNotification(profileUpdated!.fcmToken, "hello world");
 
@@ -565,9 +575,17 @@ export const registerStepTwo = async (req: Request, res: Response) => {
 
     const profileCreate = await Profile.create({ fullName, lga, state, address, type, userId: id, avatar/*: convertHttpToHttps(avatar)*/ })
 
-    const profileX = await Profile.findOne({ where: { userId: id } });
+    const walletResponse = await axios.post(`${config.PAYMENT_BASE_URL}/pay-api/create-wallet`, {}, {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    })
 
-    await sendEmailResend(user!.email, "Welcome to Acepick", `Welcome on board ${profileX!.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
+    const wallet = walletResponse.data.data;
+
+    profileCreate.setDataValue('wallet', wallet);
+
+    await sendEmailResend(user!.email, "Welcome to Acepick", `Welcome on board ${profileCreate!.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
 
     await user?.update({ state: ProfileType.CLIENT ? UserState.VERIFIED : UserState.STEP_THREE })
 
@@ -583,9 +601,17 @@ export const registerStepThree = async (req: Request, res: Response) => {
     let profession: any;
 
     try {
-        let sectorResult = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/sectors/${sectorId}`)
+        let sectorResult = await axios.get(`${config.JOBS_BASE_URL}/jobs-api/sectors/${sectorId}`, {
+            headers: {
+                Authorization: req.headers.authorization
+            }
+        })
 
-        let profResult = await axios.get(`${config.JOBS_BASE_URL}/api/jobs/profs/${professionId}`)
+        let profResult = await axios.get(`${config.JOBS_BASE_URL}/jobs-api/profs/${professionId}`, {
+            headers: {
+                Authorization: req.headers.authorization
+            }
+        })
 
         sector = sectorResult.data.data
 
@@ -603,28 +629,32 @@ export const registerStepThree = async (req: Request, res: Response) => {
     }
 
 
-    let { id } = req.user;
+    try {
+        let { id } = req.user;
 
-    const user = await User.findOne({ where: { id } });
+        const user = await User.findOne({ where: { id } });
 
-    const professional = await Professional.findOne({ where: { userId: id } });
+        const professional = await Professional.findOne({ where: { userId: id } });
 
-    if (professional) return errorResponse(res, "Failed", { status: false, message: "Professional Already Exist" })
+        if (professional) return errorResponse(res, "Failed", { status: false, message: "Professional Already Exist" })
 
-    const profile = await Profile.findOne({ where: { userId: id } });
+        const profile = await Profile.findOne({ where: { userId: id } });
 
-    const professionalCreate = await Professional.create({
-        profileId: profile?.id, intro, regNum, yearsOfExp: experience, chargeFrom,
-        file: { images: [] }, userId: id, sectorId, professionId
-    })
+        const professionalCreate = await Professional.create({
+            profileId: profile?.id, intro, regNum, yearsOfExp: experience, chargeFrom,
+            file: { images: [] }, userId: id, sectorId, professionId
+        })
 
-    const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
+        // const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
 
-    await profile?.update({ type: ProfileType.PROFESSIONAL, corperate: false, switch: true })
+        await profile?.update({ type: ProfileType.PROFESSIONAL, corperate: false, switch: true })
 
-    await user?.update({ state: UserState.VERIFIED })
+        await user?.update({ state: UserState.VERIFIED })
 
-    successResponse(res, "Successful", professionalCreate)
+        successResponse(res, "Successful", professionalCreate)
+    } catch (error) {
+        return errorResponse(res, "Failed", { message: "Error creating professional", error })
+    }
 }
 
 
@@ -1455,52 +1485,52 @@ export const verifyMyBvn = async (req: Request, res: Response) => {
 
 
 
-export const verifyBvnDetail = async (req: Request, res: Response) => {
-    try {
-        const redis = new Redis();
-        const { bvnInpt } = req.body;
-        const { id } = req.user;
-        const user = await User.findOne({ where: { id } })
-        const profile = await Profile.findOne({ where: { userId: id } })
-        // console.log(profile);
-        const cachedUserBvn = await redis.getData(`bvn-${profile!.id}`);
-        if (cachedUserBvn) {
-            const { first_name, middle_name, last_name, gender, phone } = JSON.parse(cachedUserBvn);
-            const full_name = `${last_name ?? ""} ${first_name ?? ""} ${middle_name ?? ""}`;
-            if (compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()) < 0.72) {
-                console.log(full_name)
-                console.log(`${profile?.fullName}`)
-                console.log(compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()))
-                await sendEmailResend(user!.email, "Verification Failed", `Hello ${profile?.fullName}, Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
-                return errorResponse(res, 'BVN data mismatch');
-            } else {
-                await profile?.update({ verified: true })
-                await sendEmailResend(user!.email, "Verification Successful", `Hello ${profile?.fullName}, Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
-                return successResponse(res, 'Verification Successful', { full_name, gender, phone });
-            }
-        }
-        const bvn = await verifyBvn(bvnInpt);
-        if (bvn!.message.verificationStatus == "NOT VERIFIED") return errorResponse(res, `${bvn!.message.description}`);
-        await redis.setData(`bvn-${profile!.id}`, JSON.stringify(bvn.message.response), 3600); // cache in redis for 1 hour
-        const { first_name, middle_name, last_name, gender, phone } = bvn.message.response;
-        const full_name = `${last_name ?? ""} ${first_name ?? ""} ${middle_name ?? ""}`;
-        console.log(bvn.message)
-        if (compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()) < 0.72) {
-            console.log(compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()))
-            console.log(full_name)
-            console.log(`${profile?.fullName}`)
-            await sendEmailResend(user!.email, "Verification Failed", `Hello ${profile?.fullName},<br><br> Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
-            return errorResponse(res, 'BVN data mismatch');
-        } else {
-            await profile?.update({ verified: true })
-            await sendEmailResend(user!.email, "Verification Successful", `Hello ${profile?.fullName},<br><br> Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
-            return successResponse(res, 'Verification Successful', { full_name, gender, phone, });
-        }
-    } catch (error) {
-        console.log(error);
-        return errorResponse(res, `An error occurred - ${error}`);
-    }
-}
+// export const verifyBvnDetail = async (req: Request, res: Response) => {
+//     try {
+//         const redis = new Redis();
+//         const { bvnInpt } = req.body;
+//         const { id } = req.user;
+//         const user = await User.findOne({ where: { id } })
+//         const profile = await Profile.findOne({ where: { userId: id } })
+//         // console.log(profile);
+//         const cachedUserBvn = await redis.getData(`bvn-${profile!.id}`);
+//         if (cachedUserBvn) {
+//             const { first_name, middle_name, last_name, gender, phone } = JSON.parse(cachedUserBvn);
+//             const full_name = `${last_name ?? ""} ${first_name ?? ""} ${middle_name ?? ""}`;
+//             if (compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()) < 0.72) {
+//                 console.log(full_name)
+//                 console.log(`${profile?.fullName}`)
+//                 console.log(compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()))
+//                 await sendEmailResend(user!.email, "Verification Failed", `Hello ${profile?.fullName}, Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
+//                 return errorResponse(res, 'BVN data mismatch');
+//             } else {
+//                 await profile?.update({ verified: true })
+//                 await sendEmailResend(user!.email, "Verification Successful", `Hello ${profile?.fullName}, Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
+//                 return successResponse(res, 'Verification Successful', { full_name, gender, phone });
+//             }
+//         }
+//         const bvn = await verifyBvn(bvnInpt);
+//         if (bvn!.message.verificationStatus == "NOT VERIFIED") return errorResponse(res, `${bvn!.message.description}`);
+//         await redis.setData(`bvn-${profile!.id}`, JSON.stringify(bvn.message.response), 3600); // cache in redis for 1 hour
+//         const { first_name, middle_name, last_name, gender, phone } = bvn.message.response;
+//         const full_name = `${last_name ?? ""} ${first_name ?? ""} ${middle_name ?? ""}`;
+//         console.log(bvn.message)
+//         if (compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()) < 0.72) {
+//             console.log(compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()))
+//             console.log(full_name)
+//             console.log(`${profile?.fullName}`)
+//             await sendEmailResend(user!.email, "Verification Failed", `Hello ${profile?.fullName},<br><br> Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
+//             return errorResponse(res, 'BVN data mismatch');
+//         } else {
+//             await profile?.update({ verified: true })
+//             await sendEmailResend(user!.email, "Verification Successful", `Hello ${profile?.fullName},<br><br> Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
+//             return successResponse(res, 'Verification Successful', { full_name, gender, phone, });
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         return errorResponse(res, `An error occurred - ${error}`);
+//     }
+// }
 
 
 

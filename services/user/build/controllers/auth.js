@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyBvnDetail = exports.verifyMyBvn = exports.postlocationData = exports.changePassword = exports.updateFcmToken = exports.swithAccount = exports.corperateReg = exports.registerStepThree = exports.registerStepTwo = exports.upload_avatar = exports.deleteUsers = exports.login = exports.passwordChange = exports.register = exports.verifyOtp = exports.sendOtp = exports.updateProfile = exports.authorize = void 0;
+exports.verifyMyBvn = exports.postlocationData = exports.changePassword = exports.updateFcmToken = exports.swithAccount = exports.corperateReg = exports.registerStepThree = exports.registerStepTwo = exports.upload_avatar = exports.deleteUsers = exports.login = exports.passwordChange = exports.register = exports.verifyOtp = exports.sendOtp = exports.updateProfile = exports.authorize = void 0;
 const utility_1 = require("../utils/utility");
 const configSetup_1 = __importDefault(require("../config/configSetup"));
 const Verify_1 = require("../models/Verify");
@@ -22,17 +22,14 @@ const bcryptjs_1 = require("bcryptjs");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const Profile_1 = require("../models/Profile");
 // import { Professional } from "../models/Professional";
-const Wallet_1 = require("../models/Wallet");
 const LanLog_1 = require("../models/LanLog");
 // import { Sector } from "../models/Sector";
 // import { Profession } from "../models/Profession";
 const Cooperation_1 = require("../models/Cooperation");
 // import { Review } from "../models/Review";
 const bvn_1 = require("../services/bvn");
-const string_similarity_1 = require("string-similarity");
 // yarn add stream-chat
 const stream_chat_1 = require("stream-chat");
-const redis_1 = require("../services/redis");
 const Professional_1 = require("../models/Professional");
 const axios_1 = __importDefault(require("axios"));
 const jsonwebtoken_2 = require("jsonwebtoken");
@@ -282,9 +279,6 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const user = yield User_1.User.create({
                 email, phone, password: hashedPassword, role
             });
-            //TODO use a request to payment create the wallet
-            const wallet = yield Wallet_1.Wallet.create({ userId: user.id });
-            // await user.update({ walletId: wallet.id })
             const emailServiceId = (0, utility_1.randomId)(12);
             const codeEmail = String(Math.floor(1000 + Math.random() * 9000));
             yield Verify_1.Verify.create({
@@ -328,7 +322,6 @@ exports.register = register;
 const passwordChange = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { password, confirmPassword } = req.body;
     const { id } = req.user;
-    console.log("id", id);
     if (password !== confirmPassword)
         return (0, utility_1.errorResponse)(res, "Password do not match", { status: false, message: "Password do not match" });
     const user = yield User_1.User.findOne({ where: { id } });
@@ -344,27 +337,39 @@ const passwordChange = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.passwordChange = passwordChange;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { email, password, type, fcmToken } = req.body;
-    const user = yield User_1.User.findOne({ where: { email } });
-    if (!user)
-        return (0, utility_1.handleResponse)(res, 404, false, "User does not exist");
-    const match = yield (0, bcryptjs_1.compare)(password, user.password);
-    if (!match)
-        return (0, utility_1.handleResponse)(res, 404, false, "Invalid Credentials");
-    let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, role: user.role }, configSetup_1.default.TOKEN_SECRET);
-    const chatToken = serverClient.createToken(`${String(user.id)}`);
-    const profile = yield Profile_1.Profile.findOne({ where: { userId: user.id } });
-    yield (profile === null || profile === void 0 ? void 0 : profile.update({ fcmToken }));
-    const profileUpdated = yield Profile_1.Profile.findOne({
-        where: { userId: user.id },
-        include: [{
-                model: User_1.User,
-                attributes: ['id', 'email', 'phone', 'fcmToken', 'status'],
-                include: [{
-                        model: Wallet_1.Wallet
-                    }]
-            }]
-    });
-    return (0, utility_1.successResponse)(res, "Successful", { status: true, profile: profileUpdated, token, chatToken });
+    try {
+        const user = yield User_1.User.findOne({ where: { email } });
+        if (!user)
+            return (0, utility_1.handleResponse)(res, 404, false, "User does not exist");
+        const match = yield (0, bcryptjs_1.compare)(password, user.password);
+        if (!match)
+            return (0, utility_1.handleResponse)(res, 404, false, "Invalid Credentials");
+        let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, role: user.role }, configSetup_1.default.TOKEN_SECRET);
+        const chatToken = serverClient.createToken(`${String(user.id)}`);
+        const profile = yield Profile_1.Profile.findOne({ where: { userId: user.id } });
+        yield (profile === null || profile === void 0 ? void 0 : profile.update({ fcmToken }));
+        const profileUpdated = yield Profile_1.Profile.findOne({
+            where: { userId: user.id },
+            include: [{
+                    model: User_1.User,
+                    attributes: ['id', 'email', 'phone', 'fcmToken', 'status'],
+                    // include: [{
+                    //     model: Wallet
+                    // }]
+                }]
+        });
+        const walletResponse = yield axios_1.default.get(`${configSetup_1.default.PAYMENT_BASE_URL}/pay-api/view-wallet`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const wallet = walletResponse.data.data;
+        profileUpdated === null || profileUpdated === void 0 ? void 0 : profileUpdated.setDataValue('wallet', wallet);
+        return (0, utility_1.successResponse)(res, "Successful", { status: true, profile: profileUpdated, token, chatToken });
+    }
+    catch (error) {
+        return (0, utility_1.errorResponse)(res, 'error', error.message);
+    }
     // profile?.fcmToken == null ? null : sendExpoNotification(profileUpdated!.fcmToken, "hello world");
     // if (profile?.type == ProfileType.CLIENT) {
     //     if (type == profile?.type) {
@@ -479,8 +484,14 @@ const registerStepTwo = (req, res) => __awaiter(void 0, void 0, void 0, function
     if (profile)
         return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Profile Already Exist" });
     const profileCreate = yield Profile_1.Profile.create({ fullName, lga, state, address, type, userId: id, avatar /*: convertHttpToHttps(avatar)*/ });
-    const profileX = yield Profile_1.Profile.findOne({ where: { userId: id } });
-    yield (0, sms_1.sendEmailResend)(user.email, "Welcome to Acepick", `Welcome on board ${profileX.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
+    const walletResponse = yield axios_1.default.post(`${configSetup_1.default.PAYMENT_BASE_URL}/pay-api/create-wallet`, {}, {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    });
+    const wallet = walletResponse.data.data;
+    profileCreate.setDataValue('wallet', wallet);
+    yield (0, sms_1.sendEmailResend)(user.email, "Welcome to Acepick", `Welcome on board ${profileCreate.fullName},<br><br> we are pleased to have you on Acepick, please validate your account by providing your BVN to get accessible to all features on Acepick.<br><br> Thanks.`);
     yield (user === null || user === void 0 ? void 0 : user.update({ state: Profile_1.ProfileType.CLIENT ? User_1.UserState.VERIFIED : User_1.UserState.STEP_THREE }));
     (0, utility_1.successResponse)(res, "Successful", { status: true, message: profileCreate });
 });
@@ -490,8 +501,16 @@ const registerStepThree = (req, res) => __awaiter(void 0, void 0, void 0, functi
     let sector;
     let profession;
     try {
-        let sectorResult = yield axios_1.default.get(`${configSetup_1.default.JOBS_BASE_URL}/api/jobs/sectors/${sectorId}`);
-        let profResult = yield axios_1.default.get(`${configSetup_1.default.JOBS_BASE_URL}/api/jobs/profs/${professionId}`);
+        let sectorResult = yield axios_1.default.get(`${configSetup_1.default.JOBS_BASE_URL}/jobs-api/sectors/${sectorId}`, {
+            headers: {
+                Authorization: req.headers.authorization
+            }
+        });
+        let profResult = yield axios_1.default.get(`${configSetup_1.default.JOBS_BASE_URL}/jobs-api/profs/${professionId}`, {
+            headers: {
+                Authorization: req.headers.authorization
+            }
+        });
         sector = sectorResult.data.data;
         profession = profResult.data.data;
     }
@@ -504,20 +523,25 @@ const registerStepThree = (req, res) => __awaiter(void 0, void 0, void 0, functi
     if (!profession) {
         return (0, utility_1.errorResponse)(res, "Failed", { message: "Profession not found" });
     }
-    let { id } = req.user;
-    const user = yield User_1.User.findOne({ where: { id } });
-    const professional = yield Professional_1.Professional.findOne({ where: { userId: id } });
-    if (professional)
-        return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Professional Already Exist" });
-    const profile = yield Profile_1.Profile.findOne({ where: { userId: id } });
-    const professionalCreate = yield Professional_1.Professional.create({
-        profileId: profile === null || profile === void 0 ? void 0 : profile.id, intro, regNum, yearsOfExp: experience, chargeFrom,
-        file: { images: [] }, userId: id, sectorId, professionId
-    });
-    const wallet = yield Wallet_1.Wallet.create({ userId: user === null || user === void 0 ? void 0 : user.id, type: Wallet_1.WalletType.PROFESSIONAL });
-    yield (profile === null || profile === void 0 ? void 0 : profile.update({ type: Profile_1.ProfileType.PROFESSIONAL, corperate: false, switch: true }));
-    yield (user === null || user === void 0 ? void 0 : user.update({ state: User_1.UserState.VERIFIED }));
-    (0, utility_1.successResponse)(res, "Successful", professionalCreate);
+    try {
+        let { id } = req.user;
+        const user = yield User_1.User.findOne({ where: { id } });
+        const professional = yield Professional_1.Professional.findOne({ where: { userId: id } });
+        if (professional)
+            return (0, utility_1.errorResponse)(res, "Failed", { status: false, message: "Professional Already Exist" });
+        const profile = yield Profile_1.Profile.findOne({ where: { userId: id } });
+        const professionalCreate = yield Professional_1.Professional.create({
+            profileId: profile === null || profile === void 0 ? void 0 : profile.id, intro, regNum, yearsOfExp: experience, chargeFrom,
+            file: { images: [] }, userId: id, sectorId, professionId
+        });
+        // const wallet = await Wallet.create({ userId: user?.id, type: WalletType.PROFESSIONAL })
+        yield (profile === null || profile === void 0 ? void 0 : profile.update({ type: Profile_1.ProfileType.PROFESSIONAL, corperate: false, switch: true }));
+        yield (user === null || user === void 0 ? void 0 : user.update({ state: User_1.UserState.VERIFIED }));
+        (0, utility_1.successResponse)(res, "Successful", professionalCreate);
+    }
+    catch (error) {
+        return (0, utility_1.errorResponse)(res, "Failed", { message: "Error creating professional", error });
+    }
 });
 exports.registerStepThree = registerStepThree;
 const corperateReg = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -1162,57 +1186,52 @@ const verifyMyBvn = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.verifyMyBvn = verifyMyBvn;
-const verifyBvnDetail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const redis = new redis_1.Redis();
-        const { bvnInpt } = req.body;
-        const { id } = req.user;
-        const user = yield User_1.User.findOne({ where: { id } });
-        const profile = yield Profile_1.Profile.findOne({ where: { userId: id } });
-        // console.log(profile);
-        const cachedUserBvn = yield redis.getData(`bvn-${profile.id}`);
-        if (cachedUserBvn) {
-            const { first_name, middle_name, last_name, gender, phone } = JSON.parse(cachedUserBvn);
-            const full_name = `${last_name !== null && last_name !== void 0 ? last_name : ""} ${first_name !== null && first_name !== void 0 ? first_name : ""} ${middle_name !== null && middle_name !== void 0 ? middle_name : ""}`;
-            if ((0, string_similarity_1.compareTwoStrings)(`${full_name}`.toLowerCase(), `${profile === null || profile === void 0 ? void 0 : profile.fullName}`.toLowerCase()) < 0.72) {
-                console.log(full_name);
-                console.log(`${profile === null || profile === void 0 ? void 0 : profile.fullName}`);
-                console.log((0, string_similarity_1.compareTwoStrings)(`${full_name}`.toLowerCase(), `${profile === null || profile === void 0 ? void 0 : profile.fullName}`.toLowerCase()));
-                yield (0, sms_1.sendEmailResend)(user.email, "Verification Failed", `Hello ${profile === null || profile === void 0 ? void 0 : profile.fullName}, Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
-                return (0, utility_1.errorResponse)(res, 'BVN data mismatch');
-            }
-            else {
-                yield (profile === null || profile === void 0 ? void 0 : profile.update({ verified: true }));
-                yield (0, sms_1.sendEmailResend)(user.email, "Verification Successful", `Hello ${profile === null || profile === void 0 ? void 0 : profile.fullName}, Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
-                return (0, utility_1.successResponse)(res, 'Verification Successful', { full_name, gender, phone });
-            }
-        }
-        const bvn = yield (0, bvn_1.verifyBvn)(bvnInpt);
-        if (bvn.message.verificationStatus == "NOT VERIFIED")
-            return (0, utility_1.errorResponse)(res, `${bvn.message.description}`);
-        yield redis.setData(`bvn-${profile.id}`, JSON.stringify(bvn.message.response), 3600); // cache in redis for 1 hour
-        const { first_name, middle_name, last_name, gender, phone } = bvn.message.response;
-        const full_name = `${last_name !== null && last_name !== void 0 ? last_name : ""} ${first_name !== null && first_name !== void 0 ? first_name : ""} ${middle_name !== null && middle_name !== void 0 ? middle_name : ""}`;
-        console.log(bvn.message);
-        if ((0, string_similarity_1.compareTwoStrings)(`${full_name}`.toLowerCase(), `${profile === null || profile === void 0 ? void 0 : profile.fullName}`.toLowerCase()) < 0.72) {
-            console.log((0, string_similarity_1.compareTwoStrings)(`${full_name}`.toLowerCase(), `${profile === null || profile === void 0 ? void 0 : profile.fullName}`.toLowerCase()));
-            console.log(full_name);
-            console.log(`${profile === null || profile === void 0 ? void 0 : profile.fullName}`);
-            yield (0, sms_1.sendEmailResend)(user.email, "Verification Failed", `Hello ${profile === null || profile === void 0 ? void 0 : profile.fullName},<br><br> Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
-            return (0, utility_1.errorResponse)(res, 'BVN data mismatch');
-        }
-        else {
-            yield (profile === null || profile === void 0 ? void 0 : profile.update({ verified: true }));
-            yield (0, sms_1.sendEmailResend)(user.email, "Verification Successful", `Hello ${profile === null || profile === void 0 ? void 0 : profile.fullName},<br><br> Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
-            return (0, utility_1.successResponse)(res, 'Verification Successful', { full_name, gender, phone, });
-        }
-    }
-    catch (error) {
-        console.log(error);
-        return (0, utility_1.errorResponse)(res, `An error occurred - ${error}`);
-    }
-});
-exports.verifyBvnDetail = verifyBvnDetail;
+// export const verifyBvnDetail = async (req: Request, res: Response) => {
+//     try {
+//         const redis = new Redis();
+//         const { bvnInpt } = req.body;
+//         const { id } = req.user;
+//         const user = await User.findOne({ where: { id } })
+//         const profile = await Profile.findOne({ where: { userId: id } })
+//         // console.log(profile);
+//         const cachedUserBvn = await redis.getData(`bvn-${profile!.id}`);
+//         if (cachedUserBvn) {
+//             const { first_name, middle_name, last_name, gender, phone } = JSON.parse(cachedUserBvn);
+//             const full_name = `${last_name ?? ""} ${first_name ?? ""} ${middle_name ?? ""}`;
+//             if (compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()) < 0.72) {
+//                 console.log(full_name)
+//                 console.log(`${profile?.fullName}`)
+//                 console.log(compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()))
+//                 await sendEmailResend(user!.email, "Verification Failed", `Hello ${profile?.fullName}, Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
+//                 return errorResponse(res, 'BVN data mismatch');
+//             } else {
+//                 await profile?.update({ verified: true })
+//                 await sendEmailResend(user!.email, "Verification Successful", `Hello ${profile?.fullName}, Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
+//                 return successResponse(res, 'Verification Successful', { full_name, gender, phone });
+//             }
+//         }
+//         const bvn = await verifyBvn(bvnInpt);
+//         if (bvn!.message.verificationStatus == "NOT VERIFIED") return errorResponse(res, `${bvn!.message.description}`);
+//         await redis.setData(`bvn-${profile!.id}`, JSON.stringify(bvn.message.response), 3600); // cache in redis for 1 hour
+//         const { first_name, middle_name, last_name, gender, phone } = bvn.message.response;
+//         const full_name = `${last_name ?? ""} ${first_name ?? ""} ${middle_name ?? ""}`;
+//         console.log(bvn.message)
+//         if (compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()) < 0.72) {
+//             console.log(compareTwoStrings(`${full_name}`.toLowerCase(), `${profile?.fullName}`.toLowerCase()))
+//             console.log(full_name)
+//             console.log(`${profile?.fullName}`)
+//             await sendEmailResend(user!.email, "Verification Failed", `Hello ${profile?.fullName},<br><br> Your account validated failed,<br><br> reason: BVN data mismatch.<br><br> Try again. Best Regards.`);
+//             return errorResponse(res, 'BVN data mismatch');
+//         } else {
+//             await profile?.update({ verified: true })
+//             await sendEmailResend(user!.email, "Verification Successful", `Hello ${profile?.fullName},<br><br> Your account is now validated, you now have full access to all features.<br><br> Thank you for trusting Acepick. Best Regards.`);
+//             return successResponse(res, 'Verification Successful', { full_name, gender, phone, });
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         return errorResponse(res, `An error occurred - ${error}`);
+//     }
+// }
 // export const getEarningSummary = async (req: Request, res: Response) => {
 //     const today = new Date();
 //     const year = today.getFullYear();

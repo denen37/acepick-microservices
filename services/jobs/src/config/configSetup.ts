@@ -6,6 +6,7 @@ type Config = {
     HOST: string | undefined;
     PORT: number | undefined;
     AUTH_BASE_URL: string | undefined;
+    PAYMENT_BASE_URL: string | undefined;
     NODE_ENV: string | undefined;
     DB_NAME: string | undefined;
     DB_USER: string | undefined;
@@ -13,6 +14,11 @@ type Config = {
     DB_HOST: string | undefined;
     DB_PORT: number | undefined;
     DB_DIALECT: string | undefined;
+    EMAIL_SERVICE: string | undefined;
+    EMAIL_HOST: string | undefined;
+    EMAIL_PORT: number | undefined;
+    EMAIL_USER: string | undefined;
+    EMAIL_PASS: string | undefined;
     PUBLIC_ROUTES: string[] | [];
     REDIS_INSTANCE_URL: string | undefined;
     PAYSTACK_SECRET: string | undefined;
@@ -24,6 +30,7 @@ const getConfig = (): Config => {
     return {
         HOST: process.env.HOST,
         AUTH_BASE_URL: process.env.AUTH_BASE_URL,
+        PAYMENT_BASE_URL: process.env.PAYMENT_BASE_URL,
         PORT: Number(process.env.PORT),
         NODE_ENV: process.env.NODE_ENV,
         DB_NAME: process.env.DB_NAME,
@@ -32,7 +39,13 @@ const getConfig = (): Config => {
         DB_HOST: process.env.DB_HOST,
         DB_PORT: Number(process.env.DB_PORT),
         DB_DIALECT: process.env.DB_DIALECT,
+        EMAIL_SERVICE: process.env.EMAIL_SERVICE,
+        EMAIL_PORT: Number(process.env.EMAIL_PORT),
+        EMAIL_USER: process.env.EMAIL_USER,
+        EMAIL_PASS: process.env.EMAIL_PASS,
+        EMAIL_HOST: process.env.EMAIL_HOST,
         REDIS_INSTANCE_URL: process.env.REDIS_INSTANCE_URL,
+
         PAYSTACK_SECRET: process.env.PAYSTACK_SECRET,
         RABBITMQ_URL: process.env.RABBITMQ_URL,
         PUBLIC_ROUTES: [

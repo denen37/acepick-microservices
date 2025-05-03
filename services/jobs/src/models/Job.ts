@@ -3,8 +3,8 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 // import { Wallet } from './Wallet';
 // import { LanLog } from './LanLog';
 // import { User } from './User';
-// import { Dispute } from './Dispute';
-// import { Material } from './Material';
+import { Dispute } from './Dispute';
+import { Material } from './Material';
 // import { VoiceRecording } from './VoiceRecording';
 
 
@@ -16,12 +16,13 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 
 export enum JobStatus {
     COMPLETED = 'COMPLETED',
+    APPROVED = 'APPROVED',
     DISPUTED = 'DISPUTED',
     PENDING = 'PENDING',
+    DECLINED = 'DECLINED',
     ONGOING = "ONGOING",
     CANCEL = "CANCEL",
     REJECTED = "REJECTED",
-    INVOICE = "INVOICE"
 }
 
 
@@ -29,6 +30,20 @@ export enum JobStatus {
 export enum modeType {
     VIRTUAL = "VIRTUAL",
     PHYSICAL = "PHYSICAL"
+}
+
+export enum PaidFor {
+    WORKMANSHIP = 'workmanship',
+    MATERIAL = 'material',
+    BOTH = 'both'
+}
+
+export enum PayStatus {
+    UNPAID = 'unpaid',
+    PAID = 'paid',
+    PARTIALLY_PAID = 'partially_paid',
+    REFUNDED = 'refunded',
+    RELEASED = 'released',
 }
 
 
@@ -42,8 +57,6 @@ export class Job extends Model {
     @Column(DataType.STRING)
     description!: string
 
-
-
     @AllowNull(true)
     @Column(DataType.STRING)
     title!: string
@@ -51,7 +64,7 @@ export class Job extends Model {
     @Default(false)
     @AllowNull(false)
     @Column(DataType.BOOLEAN)
-    seen!: boolean
+    accepted!: boolean
 
 
     @Default(false)
@@ -110,45 +123,45 @@ export class Job extends Model {
 
 
 
-    @Default(null)
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    ownerLocationDeparture!: any;
+    // @Default(null)
+    // @AllowNull(true)
+    // @Column(DataType.JSON)
+    // ownerLocationDeparture!: any;
 
 
-    @Default(null)
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    currentOwnerLocationDeparture!: any;
-
-
-
-    @Default(null)
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    currentOwnerLocationArrival!: any;
+    // @Default(null)
+    // @AllowNull(true)
+    // @Column(DataType.JSON)
+    // currentOwnerLocationDeparture!: any;
 
 
 
-
-    @Default(null)
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    currentClientLocationArrival!: any;
-
-
-
-    @Default(null)
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    currentClientLocationDeparture!: any;
+    // @Default(null)
+    // @AllowNull(true)
+    // @Column(DataType.JSON)
+    // currentOwnerLocationArrival!: any;
 
 
 
-    @Default(null)
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    ownerLocationArrival!: any;
+
+    // @Default(null)
+    // @AllowNull(true)
+    // @Column(DataType.JSON)
+    // currentClientLocationArrival!: any;
+
+
+
+    // @Default(null)
+    // @AllowNull(true)
+    // @Column(DataType.JSON)
+    // currentClientLocationDeparture!: any;
+
+
+
+    // @Default(null)
+    // @AllowNull(true)
+    // @Column(DataType.JSON)
+    // ownerLocationArrival!: any;
 
 
     @Default(null)
@@ -178,73 +191,83 @@ export class Job extends Model {
     isLocationMatch!: string
 
 
-    @Default(false)
+    // @Default(false)
+    // @AllowNull(true)
+    // @Column(DataType.BOOLEAN)
+    // ownerMatchArrival!: string
+
+
+
+    // @Default(false)
+    // @AllowNull(true)
+    // @Column(DataType.BOOLEAN)
+    // clientMatchArrival!: string
+
+
+
+    // @Default(false)
+    // @AllowNull(true)
+    // @Column(DataType.BOOLEAN)
+    // clientMatchDeparture!: string
+
+
+
+    // @Default(false)
+    // @AllowNull(true)
+    // @Column(DataType.BOOLEAN)
+    // ownerMatchDeparture!: string
+
+
+
+    // @Default(false)
+    // @AllowNull(true)
+    // @Column(DataType.BOOLEAN)
+    // processed!: string
+
+
+
+
+
+    @Default(PayStatus.UNPAID)
+    @AllowNull(true)
+    @Column(DataType.ENUM(...Object.values(PayStatus)))
+    payStatus!: string
+
+
+
+    @Default(PaidFor.WORKMANSHIP)
+    @AllowNull(false)
+    @Column(DataType.ENUM(PaidFor.WORKMANSHIP, PaidFor.MATERIAL, PaidFor.BOTH))
+    paidFor!: string
+
+
+    @AllowNull(true)
+    @Column(DataType.UUID)
+    paymentRef!: string
+
+
+    @AllowNull(true)
+    @Column(DataType.DECIMAL(10, 2))
+    workmanship!: number
+
+
+
+    @AllowNull(true)
+    @Column(DataType.DECIMAL(10, 2))
+    materials!: number
+
+
+
+
     @AllowNull(true)
     @Column(DataType.BOOLEAN)
-    ownerMatchArrival!: string
-
-
-
-    @Default(false)
-    @AllowNull(true)
-    @Column(DataType.BOOLEAN)
-    clientMatchArrival!: string
-
-
-
-    @Default(false)
-    @AllowNull(true)
-    @Column(DataType.BOOLEAN)
-    clientMatchDeparture!: string
-
-
-
-    @Default(false)
-    @AllowNull(true)
-    @Column(DataType.BOOLEAN)
-    ownerMatchDeparture!: string
-
-
-
-    @Default(false)
-    @AllowNull(true)
-    @Column(DataType.BOOLEAN)
-    processed!: string
-
-
-
-
-
-    @Default(false)
-    @AllowNull(true)
-    @Column(DataType.BOOLEAN)
-    paid!: string
-
-
-
-
-    @AllowNull(true)
-    @Column(DataType.INTEGER)
-    workmannShip!: number
-
-
-
-    @AllowNull(true)
-    @Column(DataType.BOOLEAN)
-    isMaterial!: string
-
-
-
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    gettingMaterial!: string
+    isMaterial!: boolean
 
 
 
     @AllowNull(true)
     @Column(DataType.DOUBLE)
     lan!: number
-
 
 
     @AllowNull(true)
@@ -261,23 +284,26 @@ export class Job extends Model {
     @Column(DataType.INTEGER)
     durationValue!: string
 
-    @Default(JobStatus.INVOICE)
-    @Column(DataType.ENUM(JobStatus.COMPLETED, JobStatus.REJECTED, JobStatus.DISPUTED, JobStatus.PENDING, JobStatus.ONGOING, JobStatus.CANCEL, JobStatus.INVOICE))
+    @Default(JobStatus.PENDING)
+    @AllowNull(false)
+    @Column(DataType.ENUM(...Object.values(JobStatus)))
     status!: JobStatus;
 
 
     // @ForeignKey(() => User)
     @AllowNull(true)
     @Column(DataType.UUID)
-    ownerId!: string;
+    clientId!: string;
+
+    client!: any;
 
 
     // @ForeignKey(() => User)
     @AllowNull(true)
     @Column(DataType.UUID)
-    userId!: string;
+    profId!: string;
 
-    
+    prof!: any;
 
     @AllowNull(true)
     @Column(DataType.INTEGER)
@@ -303,14 +329,14 @@ export class Job extends Model {
     // @ForeignKey(() => User)
     // owner!: User;
 
-    // @HasMany(() => Dispute, { onDelete: 'CASCADE' })
-    // dispute!: Dispute[];
+    @HasMany(() => Dispute, { onDelete: 'CASCADE' })
+    dispute!: Dispute[];
 
 
     // @HasMany(() => VoiceRecording, { onDelete: 'CASCADE' })
     // record!: VoiceRecording[];
 
 
-    // @HasMany(() => Material, { onDelete: 'CASCADE' })
-    // material!: Material[];
+    @HasMany(() => Material, { onDelete: 'CASCADE' })
+    material!: Material[];
 }

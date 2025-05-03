@@ -1,12 +1,16 @@
 import { Router } from "express";
-import { getProfessionals, getCooperates, ProfAccountInfo } from "../controllers/profiles";
+import { getProfessionals, getCooperates, ProfAccountInfo, metricOperations, getProfessionalById } from "../controllers/profiles";
 import { updateProfile } from "../controllers/profiles"
+import { getUser } from "../controllers/user";
 
 const routes = Router();
 
-routes.post('/get_professionals', getProfessionals)
-routes.get('/get_corporates', getCooperates)
-routes.get('/me', ProfAccountInfo);
-routes.post('/update', updateProfile);
+routes.post('/profiles/professionals', getProfessionals);
+routes.get('/profiles/professionals/:userId', getProfessionalById);
+routes.get('/profiles/get_corporates', getCooperates);
+routes.get('/profiles/me', ProfAccountInfo);
+routes.post('/profiles/update', updateProfile);
+routes.post('/profiles/update-metrics/:userId', metricOperations);
+routes.get('/users/:id', getUser);
 
 export default routes;
