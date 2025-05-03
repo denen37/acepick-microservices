@@ -204,7 +204,7 @@ services:
     ports:
       - 3309:3306
     volumes:
-      - chat-data:/var/lib/mysql
+      - payment-data:/var/lib/mysql
     networks:
       - ace-net
     healthcheck:
