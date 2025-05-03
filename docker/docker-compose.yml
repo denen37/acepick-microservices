@@ -80,8 +80,8 @@ services:
       depends_on:
         user-db:
           condition: service_healthy
-        redis:
-          condition: service_healthy
+        # redis:
+        #   condition: service_healthy
       networks:
         - ace-net
 
@@ -117,8 +117,8 @@ services:
       depends_on:
         jobs-db:
           condition: service_healthy
-        redis:
-          condition: service_healthy
+        # redis:
+        #   condition: service_healthy
       networks:
         - ace-net
 
