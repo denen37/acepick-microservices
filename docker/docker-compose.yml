@@ -25,19 +25,19 @@ services:
       - jobs
       - chat
 
-  redis:
-    image: redis:latest
-    container_name: redis
-    restart: always
-    ports:
-      - 6378:6379
-    networks:
-      - ace-net
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      retries: 5
-      timeout: 3s
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   restart: always
+  #   ports:
+  #     - 6378:6379
+  #   networks:
+  #     - ace-net
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     retries: 5
+  #     timeout: 3s
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -178,10 +178,47 @@ services:
       retries: 5
       timeout: 5s
 
+  payment:
+    build: ../services/payment
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    env_file:
+      - ../services/chat/.env
+    ports:
+      - 5003:5003
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    depends_on:
+      payment-db:
+        condition: service_healthy
+    networks:
+      - ace-net
+
+  payment-db:
+    image: mysql:8.0
+    container_name: payment-db
+    restart: always
+    env_file:
+      - ../services/payment/.env
+    ports:
+      - 3309:3306
+    volumes:
+      - chat-data:/var/lib/mysql
+    networks:
+      - ace-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"] 
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
 volumes:
   user-data:
   jobs-data:
   chat-data:
+  payment-data:
+  
 
 networks:
   ace-net:
