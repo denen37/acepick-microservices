@@ -47,7 +47,7 @@ services:
       - 8080:80 
     environment:
       PMA_ARBITRARY: 1 
-      PMA_HOSTS: user-db,jobs-db
+      PMA_HOSTS: user-db,jobs-db,chat-db,payment-db
       PMA_USER: root
       PMA_PASSWORD: Acepick@123
     networks:
