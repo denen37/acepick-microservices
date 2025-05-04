@@ -1,7 +1,7 @@
 FROM nginx:latest
 
-COPY ./nginx/nginx.prod.conf /etc/nginx/nginx.prod.conf
-COPY ./nginx/nginx.dev.conf /etc/nginx/nginx.dev.conf
+COPY ./nginx/nginx-prod.conf /etc/nginx/nginx.prod.conf
+COPY ./nginx/nginx-dev.conf /etc/nginx/nginx.dev.conf
 
 ARG ENV=dev
 ENV ENV=${ENV:-dev} 
