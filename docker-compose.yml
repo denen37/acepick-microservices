@@ -2,21 +2,21 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "80:80"
       - "443:443"
     env_file:
       - ./.env 
-    command: sh -c "echo ENV is $ENV && sleep 1000"
     environment:
     - ENV=${ENV}
     - DOMAIN_NAME=${DOMAIN_NAME}
     - BACKEND_HOST=${BACKEND_HOST}
     - BACKEND_PORT=${USER_PORT}
     volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
       - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
       - /etc/ssl/private:/etc/nginx/ssl/private:ro 
     networks:
