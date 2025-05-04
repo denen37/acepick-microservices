@@ -3,7 +3,7 @@ services:
     image: nginx:latest
     container_name: nginx
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
     ports:
       - "80:80"
