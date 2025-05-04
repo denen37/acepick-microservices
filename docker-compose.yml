@@ -8,8 +8,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    # env_file:
-    #   - ./.env 
+    env_file:
+      - ./.env 
     command: sh -c "echo ENV is $ENV && sleep 1000"
     environment:
     - ENV=${ENV}
