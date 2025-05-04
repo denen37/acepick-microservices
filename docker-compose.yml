@@ -17,8 +17,8 @@ services:
     - BACKEND_PORT=${USER_PORT}
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
-      - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
-      - /etc/ssl/private:/etc/nginx/ssl/private:ro 
+      # - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
+      # - /etc/ssl/private:/etc/nginx/ssl/private:ro 
     networks:
       - ace-net
     depends_on:
