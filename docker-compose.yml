@@ -25,6 +25,7 @@ services:
       - user
       - jobs
       - chat
+      - payment
 
   # redis:
   #   image: redis:latest
