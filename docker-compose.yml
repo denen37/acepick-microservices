@@ -67,12 +67,12 @@ services:
   #     - ace-net
     
   user:
-      build: ../services/user
+      build: ./services/user
       dns:
         - 8.8.8.8
         - 1.1.1.1
       env_file:
-        - ../services/user/.env
+        - ./services/user/.env
       ports:
         - 5000:5000
       environment:
@@ -90,7 +90,7 @@ services:
     container_name: user-db
     restart: always
     env_file:
-      - ../services/user/.env
+      - ./services/user/.env
     ports:
       - 3307:3306
     volumes:
@@ -104,12 +104,12 @@ services:
       timeout: 5s
 
   jobs:
-      build: ../services/jobs
+      build: ./services/jobs
       dns:
         - 8.8.8.8
         - 1.1.1.1
       env_file:
-        - ../services/jobs/.env
+        - ./services/jobs/.env
       ports:
         - 5001:5001
       environment:
@@ -127,7 +127,7 @@ services:
     container_name: jobs-db
     restart: always
     env_file:
-      - ../services/jobs/.env
+      - ./services/jobs/.env
     environment: 
       MYSQL_ROOT_PASSWORD: Acepick@123
       MYSQL_DATABASE: jobs
@@ -144,12 +144,12 @@ services:
       timeout: 5s
 
   chat:
-    build: ../services/chat
+    build: ./services/chat
     dns:
       - 8.8.8.8
       - 1.1.1.1
     env_file:
-      - ../services/chat/.env
+      - ./services/chat/.env
     ports:
       - 5002:5002
     environment:
@@ -165,7 +165,7 @@ services:
     container_name: chat-db
     restart: always
     env_file:
-      - ../services/chat/.env
+      - ./services/chat/.env
     ports:
       - 3309:3306
     volumes:
@@ -179,12 +179,12 @@ services:
       timeout: 5s
 
   payment:
-    build: ../services/payment
+    build: ./services/payment
     dns:
       - 8.8.8.8
       - 1.1.1.1
     env_file:
-      - ../services/chat/.env
+      - ./services/chat/.env
     ports:
       - 5003:5003
     environment:
@@ -200,7 +200,7 @@ services:
     container_name: payment-db
     restart: always
     env_file:
-      - ../services/payment/.env
+      - ./services/payment/.env
     ports:
       - 3310:3306
     volumes:
