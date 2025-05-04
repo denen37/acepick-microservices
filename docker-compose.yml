@@ -17,6 +17,7 @@ services:
     - BACKEND_HOST=${BACKEND_HOST}
     - BACKEND_PORT=${USER_PORT}
     volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
       - /etc/ssl/certs:/etc/nginx/ssl/certs:ro  
       - /etc/ssl/private:/etc/nginx/ssl/private:ro 
     networks:
