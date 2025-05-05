@@ -5,7 +5,6 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 type Config = {
     PORT: number | undefined;
     AUTH_BASE_URL: string | undefined;
-    JOBS_BASE_URL: string | undefined;
     HOST: string | undefined;
     NODE_ENV: string | undefined;
     DB_NAME: string | undefined;
@@ -29,7 +28,6 @@ const getConfig = (): Config => {
         PORT: Number(process.env.PORT),
         HOST: process.env.HOST,
         AUTH_BASE_URL: process.env.AUTH_BASE_URL,
-        JOBS_BASE_URL: process.env.JOBS_BASE_URL,
         NODE_ENV: process.env.NODE_ENV,
         DB_NAME: process.env.DB_NAME,
         DB_USER: process.env.DB_USER,
