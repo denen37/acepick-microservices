@@ -23,9 +23,9 @@ services:
       - ace-net
     depends_on:
       - user
-      - jobs
-      - chat
-      - payment
+      # - jobs
+      # - chat
+      # - payment
 
   # redis:
   #   image: redis:latest
